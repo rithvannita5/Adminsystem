@@ -2514,4 +2514,145 @@ def serve_logo():
 @login_required
 def api_change_password():
     data = request.json
-    current_passwor
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    if not current_password or not new_password:
+        return jsonify({'success': False, 'error': 'សូមបំពេញព័ត៌មានទាំងអស់!'})
+
+    if len(new_password) < 6:
+        return jsonify({'success': False, 'error': 'ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងហោចណាស់ 6 តួ!'})
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    user_id = session.get('user_id')
+    cursor.execute('SELECT password FROM users WHERE id = ?', (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        conn.close()
+        return jsonify({'success': False, 'error': 'មិនឃើញអ្នកប្រើប្រាស់!'})
+
+    if row['password'] != current_password:
+        conn.close()
+        return jsonify({'success': False, 'error': 'ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវ!'})
+
+    cursor.execute('UPDATE users SET password = ? WHERE id = ?', (new_password, user_id))
+    conn.commit()
+    conn.close()
+
+    log_audit(
+        action='ប្តូរពាក្យសម្ងាត់',
+        module='ប្រព័ន្ធ',
+        details=f"អ្នកប្រើប្រាស់ {session.get('username')} បានប្តូរពាក្យសម្ងាត់"
+    )
+
+    return jsonify({'success': True, 'message': 'បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!'})
+
+# ============================================
+# TWILIO SMS VIA REQUESTS (NO LIBRARY)
+# ============================================
+import requests
+import base64
+
+TWILIO_CONFIG = {
+    'account_sid': 'ACb8ac73cba4ae97d31d882f8e0279b0ea',
+    'auth_token': 'b043b709931491a37dcf8bb733de778b',
+    'from_phone': '+14845595918'
+}
+
+def send_sms(phone, message):
+    """ផ្ញើ SMS តាមរយៈ Twilio API"""
+    try:
+        if not phone.startswith('+'):
+            if phone.startswith('0'):
+                phone = '+855' + phone[1:]
+            else:
+                phone = '+855' + phone
+
+        url = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_CONFIG['account_sid']}/Messages.json"
+        auth_string = f"{TWILIO_CONFIG['account_sid']}:{TWILIO_CONFIG['auth_token']}"
+        auth_b64 = base64.b64encode(auth_string.encode('utf-8')).decode('utf-8')
+
+        data = {
+            'From': TWILIO_CONFIG['from_phone'],
+            'To': phone,
+            'Body': message
+        }
+        headers = {
+            'Authorization': f'Basic {auth_b64}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+
+        response = requests.post(url, data=data, headers=headers)
+        return response.status_code == 201
+    except Exception as e:
+        print(f"❌ Error sending SMS: {e}")
+        return False
+
+
+# ============================================
+# TWILIO SMS VIA REQUESTS (NO LIBRARY)
+# ============================================
+import requests
+import base64
+
+TWILIO_CONFIG = {
+    'account_sid': 'ACb8ac73cba4ae97d31d882f8e0279b0ea',
+    'auth_token': 'b043b709931491a37dcf8bb733de778b',
+    'from_phone': '+14845595918'
+}
+
+def send_sms(phone, message):
+    """ផ្ញើ SMS តាមរយៈ Twilio API (ដោយមិនប្រើ Library)"""
+    try:
+        # ===== កែទម្រង់លេខទូរស័ព្ទ =====
+        if not phone.startswith('+'):
+            if phone.startswith('0'):
+                phone = '+855' + phone[1:]
+            else:
+                phone = '+855' + phone
+
+        url = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_CONFIG['account_sid']}/Messages.json"
+
+        # ===== បង្កើត Authorization =====
+        auth_string = f"{TWILIO_CONFIG['account_sid']}:{TWILIO_CONFIG['auth_token']}"
+        auth_bytes = auth_string.encode('utf-8')
+        auth_b64 = base64.b64encode(auth_bytes).decode('utf-8')
+
+        data = {
+            'From': TWILIO_CONFIG['from_phone'],
+            'To': phone,
+            'Body': message
+        }
+
+        headers = {
+            'Authorization': f'Basic {auth_b64}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+
+        print(f"📤 Sending SMS to {phone}...")
+        response = requests.post(url, data=data, headers=headers)
+
+        if response.status_code == 201:
+            print(f"✅ SMS sent to {phone}")
+            return True
+        else:
+            print(f"❌ SMS failed: {response.status_code} - {response.text}")
+            return False
+    except Exception as e:
+        print(f"❌ Error sending SMS: {e}")
+        return False
+
+# ============================================
+# INIT DATABASE
+# ============================================
+init_db()
+
+
+# ============================================
+# RUN APP
+# ============================================
+if __name__ == '__main__':
+    app.run(debug=True)
