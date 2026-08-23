@@ -2453,8 +2453,8 @@ self.addEventListener('fetch', event => {
 def serve_logo():
     logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'Logo.png')
     if os.path.exists(logo_path):
-        return send_file(logo_path, mimetype='image/png')
-    return send_from_directory('static', 'Logo.png')
+        return send_file(logo_path, mimetype='image/png', max_age=86400)
+    return send_from_directory('static', 'Logo.png', max_age=86400)
 
 
 # ============================================
