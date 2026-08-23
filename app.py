@@ -2377,31 +2377,31 @@ def favicon():
 
 
 # ============================================
-# MANIFEST.JSON
+# MANIFEST.JSON (ប្រើ Logo ផ្ទាល់ខ្លួន)
 # ============================================
 @app.route('/manifest.json')
 def manifest():
     manifest_data = {
         "name": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល",
         "short_name": "គ្រប់គ្រងរដ្ឋបាល",
-        "description": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល - ដំណើរការបានទាំង Online និង Offline",
+        "description": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល - រដ្ឋបាលស្រុកដងទង់",
         "start_url": "/dashboard",
         "display": "standalone",
-        "background_color": "#0a0a0f",
+        "background_color": "#0d1117",
         "theme_color": "#FFD700",
         "orientation": "portrait",
         "scope": "/",
         "icons": [
             {
-                "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='64' fill='%231a1a2e'/%3E%3Ctext x='256' y='380' font-size='280' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E",
-                "sizes": "512x512",
-                "type": "image/svg+xml",
+                "src": "/static/Logo.png",
+                "sizes": "192x192",
+                "type": "image/png",
                 "purpose": "any maskable"
             },
             {
-                "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='24' fill='%231a1a2e'/%3E%3Ctext x='96' y='142' font-size='105' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E",
-                "sizes": "192x192",
-                "type": "image/svg+xml",
+                "src": "/static/Logo.png",
+                "sizes": "512x512",
+                "type": "image/png",
                 "purpose": "any maskable"
             }
         ]
