@@ -2447,34 +2447,14 @@ self.addEventListener('fetch', event => {
 
 
 # ============================================
-# LOGO
+# LOGO ROUTE
 # ============================================
 @app.route('/static/Logo.png')
 def serve_logo():
-    try:
-        return send_file('static/Logo.png')
-    except:
-        try:
-            from PIL import Image, ImageDraw, ImageFont
-            import io
-
-            img = Image.new('RGB', (200, 200), color='#1a1a2e')
-            draw = ImageDraw.Draw(img)
-            draw.rounded_rectangle([0, 0, 200, 200], radius=25, fill='#1a1a2e')
-
-            try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 100)
-            except:
-                font = ImageFont.load_default()
-
-            draw.text((100, 100), "📊", fill='#FFD700', anchor="mm", font=font)
-
-            output = io.BytesIO()
-            img.save(output, format='PNG')
-            output.seek(0)
-            return send_file(output, mimetype='image/png')
-        except:
-            return "Logo not available", 404
+    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'Logo.png')
+    if os.path.exists(logo_path):
+        return send_file(logo_path, mimetype='image/png')
+    return send_from_directory('static', 'Logo.png')
 
 
 # ============================================
