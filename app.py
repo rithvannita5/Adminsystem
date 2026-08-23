@@ -9,6 +9,10 @@ import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 from flask import send_from_directory
+import random
+import string
+import socket
+import re
 
 
 # ===== TIMEZONE CAMBODIA (UTC+7) =====
@@ -27,6 +31,7 @@ def get_cambodia_date_str():
     return get_cambodia_time().strftime('%Y-%m-%d')
 
 
+# ===== DELETE FILE =====
 def delete_file_if_exists(file_path):
     """លុបឯកសារប្រសិនបើមាន"""
     if file_path and os.path.exists(file_path):
@@ -38,8 +43,8 @@ def delete_file_if_exists(file_path):
             return False
     return False
 
-import socket
 
+# ===== GET LOCAL IP =====
 def get_local_ip():
     """ទាញយក IP ម៉ាស៊ីនសម្រាប់ប្រើប្រាស់"""
     try:
@@ -51,8 +56,12 @@ def get_local_ip():
     except:
         return "127.0.0.1"
 
+
+# ===== APP INIT =====
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
+
 
 # ===== DATABASE SETUP =====
 DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'admin_system.db')
@@ -62,6 +71,8 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+
+# ===== INIT DATABASE =====
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
@@ -109,7 +120,7 @@ def init_db():
             username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             full_name TEXT,
-            email TEXT,
+            phone TEXT,
             role_id INTEGER DEFAULT 2,
             is_active INTEGER DEFAULT 1,
             created_at TEXT NOT NULL,
@@ -178,6 +189,19 @@ def init_db():
         )
     ''')
 
+    # ===== តារាង OTP =====
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS otp_codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            phone TEXT NOT NULL,
+            otp_code TEXT NOT NULL,
+            is_used INTEGER DEFAULT 0,
+            expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    ''')
+
     # ===== បន្ថែមតួនាទីលំនាំដើម =====
     cursor.execute('SELECT COUNT(*) FROM roles')
     if cursor.fetchone()[0] == 0:
@@ -197,22 +221,23 @@ def init_db():
     cursor.execute('SELECT COUNT(*) FROM users')
     if cursor.fetchone()[0] == 0:
         cursor.execute('''
-            INSERT INTO users (username, password, full_name, email, role_id, is_active, created_at, created_by)
+            INSERT INTO users (username, password, full_name, phone, role_id, is_active, created_at, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', ('admin', 'password123', 'អ្នកគ្រប់គ្រង', 'admin@system.com', 1, 1, get_cambodia_time_str(), 'system'))
+        ''', ('admin', 'password123', 'អ្នកគ្រប់គ្រង', '012345678', 1, 1, get_cambodia_time_str(), 'system'))
 
         cursor.execute('''
-            INSERT INTO users (username, password, full_name, email, role_id, is_active, created_at, created_by)
+            INSERT INTO users (username, password, full_name, phone, role_id, is_active, created_at, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', ('user', 'userpass', 'អ្នកប្រើប្រាស់', 'user@system.com', 2, 1, get_cambodia_time_str(), 'system'))
+        ''', ('user', 'userpass', 'អ្នកប្រើប្រាស់', '098765432', 2, 1, get_cambodia_time_str(), 'system'))
 
         cursor.execute('''
-            INSERT INTO users (username, password, full_name, email, role_id, is_active, created_at, created_by)
+            INSERT INTO users (username, password, full_name, phone, role_id, is_active, created_at, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', ('sok', 'password123', 'សុខ សុភាព', 'sok@system.com', 2, 1, get_cambodia_time_str(), 'system'))
+        ''', ('sok', 'password123', 'សុខ សុភាព', '097654321', 2, 1, get_cambodia_time_str(), 'system'))
 
     conn.commit()
     conn.close()
+
 
 # ===== LOGIN REQUIRED DECORATOR =====
 def login_required(f):
@@ -222,6 +247,7 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
 
 # ===== PERMISSION CHECK =====
 PERMISSIONS_LIST = {
@@ -339,10 +365,9 @@ def log_audit(action, module, record_id=None, details=None):
     try:
         conn = get_db()
         cursor = conn.cursor()
-        
-        # ទាញយក IP របស់អ្នកប្រើ
+
         ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
-        
+
         cursor.execute('''
             INSERT INTO audit_logs (user_id, username, action, module, record_id, details, ip_address, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -360,6 +385,23 @@ def log_audit(action, module, record_id=None, details=None):
         conn.close()
     except Exception as e:
         print(f"Error logging audit: {e}")
+
+
+# ============================================
+# GENERATE RANDOM PASSWORD
+# ============================================
+def generate_random_password(length=10):
+    """បង្កើតពាក្យសម្ងាត់ថ្មីដោយស្វ័យប្រវត្តិ"""
+    characters = string.ascii_letters + string.digits + '!@#$%^&*'
+    return ''.join(random.choice(characters) for i in range(length))
+
+
+# ============================================
+# GENERATE OTP
+# ============================================
+def generate_otp(length=6):
+    """បង្កើត OTP ចៃដន្យ"""
+    return ''.join(random.choices('0123456789', k=length))
 
 
 # ===== JINJA2 CONTEXT PROCESSOR =====
@@ -389,12 +431,14 @@ def utility_processor():
 
     return dict(get_user_permissions=get_user_permissions, get_version=get_version)
 
+
 # ============================================
 # ROUTE: INSTALL (PWA)
 # ============================================
 @app.route('/install')
 def install():
     return render_template('install.html')
+
 
 # ============================================
 # ROUTE: OFFLINE PAGE
@@ -473,6 +517,7 @@ def offline():
     </html>
     '''
 
+
 # ============================================
 # ROUTE: PWA Manifest
 # ============================================
@@ -482,6 +527,7 @@ def serve_manifest():
         return send_file('static/manifest.json', mimetype='application/json')
     except:
         return jsonify({'error': 'Manifest not found'}), 404
+
 
 # ============================================
 # ROUTE: Service Worker
@@ -493,6 +539,7 @@ def serve_service_worker():
     except:
         return jsonify({'error': 'Service Worker not found'}), 404
 
+
 # ============================================
 # ROUTE: ទំព័រដើម
 # ============================================
@@ -501,6 +548,7 @@ def home():
     if 'username' in session:
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
+
 
 # ============================================
 # ROUTE: Login
@@ -522,14 +570,13 @@ def login():
             session['user_id'] = user['id']
             session['role_id'] = user['role_id']
             session['login_time'] = get_cambodia_time_str()
-            
-            # ===== កត់ត្រាសកម្មភាព Login =====
+
             log_audit(
                 action='ចូលប្រើប្រាស់',
                 module='ប្រព័ន្ធ',
                 details=f"អ្នកប្រើប្រាស់ {username} បានចូលប្រើប្រាស់ប្រព័ន្ធ"
             )
-            
+
             flash('ចូលប្រើប្រាស់ដោយជោគជ័យ!', 'success')
             return redirect(url_for('dashboard'))
         else:
@@ -538,26 +585,27 @@ def login():
 
     return render_template('login.html')
 
+
 # ============================================
 # ROUTE: Logout
 # ============================================
 @app.route('/logout')
 def logout():
     username = session.get('username', 'unknown')
-    
-    # ===== កត់ត្រាសកម្មភាព Logout =====
+
     log_audit(
         action='ចាកចេញ',
         module='ប្រព័ន្ធ',
         details=f"អ្នកប្រើប្រាស់ {username} បានចាកចេញពីប្រព័ន្ធ"
     )
-    
+
     session.pop('username', None)
     session.pop('user_id', None)
     session.pop('role_id', None)
     session.pop('login_time', None)
     flash('អ្នកបានចាកចេញពីប្រព័ន្ធ', 'info')
     return redirect(url_for('login'))
+
 
 # ============================================
 # ROUTE: Dashboard
@@ -643,6 +691,7 @@ def dashboard():
                          chart_colors=chart_colors,
                          permissions=get_user_permissions())
 
+
 # ============================================
 # ROUTE: ឯកសារចូល (Income)
 # ============================================
@@ -653,6 +702,7 @@ def income():
     return render_template('income.html',
                          username=session['username'],
                          permissions=user_permissions)
+
 
 # ===== API: GET Income Records =====
 @app.route('/api/income', methods=['GET'])
@@ -705,6 +755,7 @@ def api_get_income():
 
     return jsonify(result)
 
+
 # ===== API: ADD Income Record =====
 @app.route('/api/income', methods=['POST'])
 @login_required
@@ -746,7 +797,6 @@ def api_add_income():
     new_id = cursor.lastrowid
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='បន្ថែម',
         module='ឯកសារចូល',
@@ -755,6 +805,7 @@ def api_add_income():
     )
 
     return jsonify({'success': True, 'id': new_id})
+
 
 # ===== API: UPDATE Income Record =====
 @app.route('/api/income/<int:record_id>', methods=['PUT'])
@@ -795,7 +846,6 @@ def api_update_income(record_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='កែប្រែ',
         module='ឯកសារចូល',
@@ -804,6 +854,7 @@ def api_update_income(record_id):
     )
 
     return jsonify({'success': True})
+
 
 # ===== API: DELETE Income Record =====
 @app.route('/api/income/<int:record_id>', methods=['DELETE'])
@@ -832,7 +883,6 @@ def api_delete_income(record_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='លុប',
         module='ឯកសារចូល',
@@ -841,6 +891,7 @@ def api_delete_income(record_id):
     )
 
     return jsonify({'success': True})
+
 
 # ===== API: EXPORT Income to Excel =====
 @app.route('/api/income/export', methods=['GET'])
@@ -921,6 +972,7 @@ def api_export_income():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
+
 # ============================================
 # ROUTE: ឯកសារចេញ (Expense)
 # ============================================
@@ -931,6 +983,7 @@ def expense():
     return render_template('expense.html',
                          username=session['username'],
                          permissions=user_permissions)
+
 
 # ===== API: GET Expense Records =====
 @app.route('/api/expense', methods=['GET'])
@@ -983,6 +1036,7 @@ def api_get_expense():
 
     return jsonify(result)
 
+
 # ===== API: ADD Expense Record =====
 @app.route('/api/expense', methods=['POST'])
 @login_required
@@ -1024,7 +1078,6 @@ def api_add_expense():
     new_id = cursor.lastrowid
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='បន្ថែម',
         module='ឯកសារចេញ',
@@ -1033,6 +1086,7 @@ def api_add_expense():
     )
 
     return jsonify({'success': True, 'id': new_id})
+
 
 # ===== API: UPDATE Expense Record =====
 @app.route('/api/expense/<int:record_id>', methods=['PUT'])
@@ -1073,7 +1127,6 @@ def api_update_expense(record_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='កែប្រែ',
         module='ឯកសារចេញ',
@@ -1082,6 +1135,7 @@ def api_update_expense(record_id):
     )
 
     return jsonify({'success': True})
+
 
 # ===== API: DELETE Expense Record =====
 @app.route('/api/expense/<int:record_id>', methods=['DELETE'])
@@ -1110,7 +1164,6 @@ def api_delete_expense(record_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='លុប',
         module='ឯកសារចេញ',
@@ -1119,6 +1172,7 @@ def api_delete_expense(record_id):
     )
 
     return jsonify({'success': True})
+
 
 # ===== API: EXPORT Expense to Excel =====
 @app.route('/api/expense/export', methods=['GET'])
@@ -1199,6 +1253,7 @@ def api_export_expense():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
+
 # ============================================
 # ROUTE: ថវិកាឯកសារចូល (Income Budget)
 # ============================================
@@ -1255,6 +1310,7 @@ def income_budget():
                          chart_colors=chart_colors,
                          permissions=get_user_permissions())
 
+
 # ============================================
 # ROUTE: របកអតិថិជនចូល (Customers)
 # ============================================
@@ -1305,6 +1361,7 @@ def customers():
                          chart_values=chart_values,
                          chart_colors=chart_colors,
                          permissions=get_user_permissions())
+
 
 # ============================================
 # ROUTE: ថវិកាឯកសារចេញ (Expense Budget)
@@ -1365,6 +1422,7 @@ def expense_budget():
                          chart_values=chart_values,
                          chart_colors=chart_colors,
                          permissions=get_user_permissions())
+
 
 # ============================================
 # ROUTE: ថវិការសរុប (Total Budget)
@@ -1462,6 +1520,7 @@ def info():
                          username=session['username'],
                          permissions=user_permissions)
 
+
 # ============================================
 # ROUTE: ការកំណត់ (Settings)
 # ============================================
@@ -1471,6 +1530,7 @@ def settings():
     return render_template('settings.html',
                          username=session['username'],
                          permissions=get_user_permissions())
+
 
 # ============================================
 # ROUTE: គ្រប់គ្រងបុគ្គលិក (Employees)
@@ -1512,6 +1572,7 @@ def api_get_info_documents():
         }
 
     return jsonify(result)
+
 
 # ===== API: UPLOAD Info Document =====
 @app.route('/api/info-documents', methods=['POST'])
@@ -1558,6 +1619,7 @@ def api_upload_info_document():
 
     return jsonify({'success': True, 'file_path': file_path, 'file_name': file.filename})
 
+
 # ===== API: DELETE Info Document =====
 @app.route('/api/info-documents/<category>', methods=['DELETE'])
 @login_required
@@ -1576,7 +1638,6 @@ def api_delete_info_document(category):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='លុបឯកសារពត៌មាន',
         module='ពត៌មាន',
@@ -1584,6 +1645,7 @@ def api_delete_info_document(category):
     )
 
     return jsonify({'success': True})
+
 
 # ============================================
 # ROUTE: បម្រើឯកសារពីថត uploads
@@ -1598,6 +1660,7 @@ def uploaded_file(filename):
         return send_from_directory('uploads', filename)
     except Exception as e:
         return jsonify({'error': str(e)}), 404
+
 
 # ===== API: GET Employees =====
 @app.route('/api/employees', methods=['GET'])
@@ -1638,6 +1701,7 @@ def api_get_employees():
         print(f"Error in api_get_employees: {e}")
         return jsonify([])
 
+
 # ===== API: ADD Employee =====
 @app.route('/api/employees', methods=['POST'])
 @login_required
@@ -1673,7 +1737,6 @@ def api_add_employee():
     new_id = cursor.lastrowid
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='បន្ថែមបុគ្គលិក',
         module='បុគ្គលិក',
@@ -1682,6 +1745,7 @@ def api_add_employee():
     )
 
     return jsonify({'success': True, 'id': new_id})
+
 
 # ===== API: UPDATE Employee =====
 @app.route('/api/employees/<int:employee_id>', methods=['PUT'])
@@ -1730,7 +1794,6 @@ def api_update_employee(employee_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='កែប្រែបុគ្គលិក',
         module='បុគ្គលិក',
@@ -1739,6 +1802,7 @@ def api_update_employee(employee_id):
     )
 
     return jsonify({'success': True})
+
 
 # ===== API: DELETE Employee =====
 @app.route('/api/employees/<int:employee_id>', methods=['DELETE'])
@@ -1762,7 +1826,6 @@ def api_delete_employee(employee_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='លុបបុគ្គលិក',
         module='បុគ្គលិក',
@@ -1771,6 +1834,7 @@ def api_delete_employee(employee_id):
     )
 
     return jsonify({'success': True})
+
 
 # ===== API: UPLOAD File =====
 @app.route('/api/upload', methods=['POST'])
@@ -1795,6 +1859,7 @@ def api_upload_file():
     file.save(file_path)
 
     return jsonify({'success': True, 'file_path': file_path, 'filename': filename})
+
 
 # ============================================
 # API: USERS
@@ -1822,7 +1887,7 @@ def api_get_users():
             'id': row['id'],
             'username': row['username'],
             'full_name': row['full_name'] or '',
-            'email': row['email'] or '',
+            'phone': row['phone'] or '',
             'role_id': row['role_id'],
             'role_name': row['role_name'] or 'No Role',
             'is_active': row['is_active'],
@@ -1830,6 +1895,7 @@ def api_get_users():
         })
 
     return jsonify(result)
+
 
 @app.route('/api/users', methods=['POST'])
 @login_required
@@ -1839,6 +1905,14 @@ def api_add_user():
 
     data = request.json
 
+    phone = data.get('phone', '').strip()
+    if not phone:
+        return jsonify({'success': False, 'error': 'សូមបញ្ចូលលេខទូរស័ព្ទរបស់អ្នកប្រើប្រាស់!'})
+
+    phone_pattern = r'^[0-9]{9,10}$'
+    if not re.match(phone_pattern, phone):
+        return jsonify({'success': False, 'error': 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ! (ត្រូវមាន 9-10 ខ្ទង់)'})
+
     conn = get_db()
     cursor = conn.cursor()
 
@@ -1847,16 +1921,21 @@ def api_add_user():
         conn.close()
         return jsonify({'success': False, 'error': 'ឈ្មោះអ្នកប្រើប្រាស់មានរួចហើយ!'})
 
+    cursor.execute('SELECT COUNT(*) FROM users WHERE phone = ?', (phone,))
+    if cursor.fetchone()[0] > 0:
+        conn.close()
+        return jsonify({'success': False, 'error': 'លេខទូរស័ព្ទនេះត្រូវបានប្រើរួចហើយ!'})
+
     password = data.get('password', 'password123')
 
     cursor.execute('''
-        INSERT INTO users (username, password, full_name, email, role_id, is_active, created_at, created_by)
+        INSERT INTO users (username, password, full_name, phone, role_id, is_active, created_at, created_by)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('username'),
         password,
         data.get('full_name', ''),
-        data.get('email', ''),
+        phone,
         data.get('role_id', 2),
         data.get('is_active', 1),
         get_cambodia_time_str(),
@@ -1866,15 +1945,15 @@ def api_add_user():
     new_id = cursor.lastrowid
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='បន្ថែមអ្នកប្រើប្រាស់',
         module='ការកំណត់',
         record_id=new_id,
-        details=f"បានបន្ថែមអ្នកប្រើប្រាស់ {data.get('username')}"
+        details=f"បានបន្ថែមអ្នកប្រើប្រាស់ {data.get('username')} (Phone: {phone})"
     )
 
     return jsonify({'success': True, 'id': new_id})
+
 
 @app.route('/api/users/<int:user_id>', methods=['PUT'])
 @login_required
@@ -1887,19 +1966,25 @@ def api_update_user(user_id):
     conn = get_db()
     cursor = conn.cursor()
 
-    # ទាញយកឈ្មោះអ្នកប្រើប្រាស់ចាស់
     cursor.execute('SELECT username FROM users WHERE id = ?', (user_id,))
     old_user = cursor.fetchone()
     old_username = old_user['username'] if old_user else 'unknown'
 
+    phone = data.get('phone', '').strip()
+    if phone:
+        phone_pattern = r'^[0-9]{9,10}$'
+        if not re.match(phone_pattern, phone):
+            conn.close()
+            return jsonify({'success': False, 'error': 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ!'})
+
     if data.get('password'):
         cursor.execute('''
             UPDATE users
-            SET full_name = ?, email = ?, role_id = ?, is_active = ?, password = ?
+            SET full_name = ?, phone = ?, role_id = ?, is_active = ?, password = ?
             WHERE id = ?
         ''', (
             data.get('full_name', ''),
-            data.get('email', ''),
+            phone,
             data.get('role_id'),
             data.get('is_active', 1),
             data.get('password'),
@@ -1908,11 +1993,11 @@ def api_update_user(user_id):
     else:
         cursor.execute('''
             UPDATE users
-            SET full_name = ?, email = ?, role_id = ?, is_active = ?
+            SET full_name = ?, phone = ?, role_id = ?, is_active = ?
             WHERE id = ?
         ''', (
             data.get('full_name', ''),
-            data.get('email', ''),
+            phone,
             data.get('role_id'),
             data.get('is_active', 1),
             user_id
@@ -1921,7 +2006,6 @@ def api_update_user(user_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='កែប្រែអ្នកប្រើប្រាស់',
         module='ការកំណត់',
@@ -1930,6 +2014,7 @@ def api_update_user(user_id):
     )
 
     return jsonify({'success': True})
+
 
 @app.route('/api/users/<int:user_id>/reset-password', methods=['POST'])
 @login_required
@@ -1942,17 +2027,15 @@ def api_reset_password(user_id):
 
     conn = get_db()
     cursor = conn.cursor()
-    
-    # ទាញយកឈ្មោះអ្នកប្រើប្រាស់
+
     cursor.execute('SELECT username FROM users WHERE id = ?', (user_id,))
     user = cursor.fetchone()
     username = user['username'] if user else 'unknown'
-    
+
     cursor.execute('UPDATE users SET password = ? WHERE id = ?', (new_password, user_id))
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='កំណត់ពាក្យសម្ងាត់ឡើងវិញ',
         module='ការកំណត់',
@@ -1961,6 +2044,7 @@ def api_reset_password(user_id):
     )
 
     return jsonify({'success': True})
+
 
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 @login_required
@@ -1973,17 +2057,15 @@ def api_delete_user(user_id):
 
     conn = get_db()
     cursor = conn.cursor()
-    
-    # ទាញយកឈ្មោះអ្នកប្រើប្រាស់មុនលុប
+
     cursor.execute('SELECT username FROM users WHERE id = ?', (user_id,))
     user = cursor.fetchone()
     username = user['username'] if user else 'unknown'
-    
+
     cursor.execute('DELETE FROM users WHERE id = ?', (user_id,))
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='លុបអ្នកប្រើប្រាស់',
         module='ការកំណត់',
@@ -1992,6 +2074,7 @@ def api_delete_user(user_id):
     )
 
     return jsonify({'success': True})
+
 
 # ============================================
 # API: ROLES
@@ -2019,6 +2102,7 @@ def api_get_roles():
 
     return jsonify(result)
 
+
 @app.route('/api/roles', methods=['POST'])
 @login_required
 def api_add_role():
@@ -2043,7 +2127,6 @@ def api_add_role():
     new_id = cursor.lastrowid
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='បន្ថែមតួនាទី',
         module='ការកំណត់',
@@ -2052,6 +2135,7 @@ def api_add_role():
     )
 
     return jsonify({'success': True, 'id': new_id})
+
 
 @app.route('/api/roles/<int:role_id>', methods=['PUT'])
 @login_required
@@ -2063,12 +2147,11 @@ def api_update_role(role_id):
 
     conn = get_db()
     cursor = conn.cursor()
-    
-    # ទាញយកឈ្មោះតួនាទីចាស់
+
     cursor.execute('SELECT name FROM roles WHERE id = ?', (role_id,))
     old_role = cursor.fetchone()
     old_name = old_role['name'] if old_role else 'unknown'
-    
+
     cursor.execute('''
         UPDATE roles
         SET name = ?, description = ?, permissions = ?
@@ -2082,7 +2165,6 @@ def api_update_role(role_id):
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='កែប្រែតួនាទី',
         module='ការកំណត់',
@@ -2092,6 +2174,7 @@ def api_update_role(role_id):
 
     return jsonify({'success': True})
 
+
 @app.route('/api/roles/<int:role_id>', methods=['DELETE'])
 @login_required
 def api_delete_role(role_id):
@@ -2100,17 +2183,15 @@ def api_delete_role(role_id):
 
     conn = get_db()
     cursor = conn.cursor()
-    
-    # ទាញយកឈ្មោះតួនាទីមុនលុប
+
     cursor.execute('SELECT name FROM roles WHERE id = ?', (role_id,))
     role = cursor.fetchone()
     role_name = role['name'] if role else 'unknown'
-    
+
     cursor.execute('DELETE FROM roles WHERE id = ?', (role_id,))
     conn.commit()
     conn.close()
 
-    # ===== កត់ត្រាសកម្មភាព =====
     log_audit(
         action='លុបតួនាទី',
         module='ការកំណត់',
@@ -2119,6 +2200,7 @@ def api_delete_role(role_id):
     )
 
     return jsonify({'success': True})
+
 
 # ============================================
 # API: AUDIT LOGS
@@ -2163,12 +2245,127 @@ def api_get_audit_logs():
 
     return jsonify(result)
 
+
 # ============================================
-# FAVICON - បម្រើ favicon.ico (គ្មាន 404)
+# API: REQUEST OTP
+# ============================================
+@app.route('/api/request-otp', methods=['POST'])
+def api_request_otp():
+    """ស្នើសុំ OTP តាមទូរស័ព្ទ"""
+    data = request.json
+    username = data.get('username', '').strip()
+    phone = data.get('phone', '').strip()
+
+    if not username or not phone:
+        return jsonify({'success': False, 'error': 'សូមបំពេញព័ត៌មានទាំងអស់!'})
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT id, username, phone FROM users
+        WHERE username = ? AND phone = ? AND is_active = 1
+    ''', (username, phone))
+
+    user = cursor.fetchone()
+
+    if not user:
+        conn.close()
+        return jsonify({'success': False, 'error': 'ឈ្មោះអ្នកប្រើប្រាស់ ឬ លេខទូរស័ព្ទមិនត្រឹមត្រូវ!'})
+
+    # ===== បង្កើត OTP =====
+    otp_code = generate_otp(6)
+    expires_at = (get_cambodia_time() + timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')
+
+    # ===== លុប OTP ចាស់ =====
+    cursor.execute('DELETE FROM otp_codes WHERE user_id = ?', (user['id'],))
+
+    # ===== រក្សាទុក OTP =====
+    cursor.execute('''
+        INSERT INTO otp_codes (user_id, phone, otp_code, expires_at, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (user['id'], phone, otp_code, expires_at, get_cambodia_time_str()))
+    conn.commit()
+    conn.close()
+
+    # ===== ផ្ញើ OTP តាម SMS =====
+    message = f'OTP របស់អ្នកគឺ: {otp_code} (មានសុពលភាព 5 នាទី)'
+    sms_sent = send_sms(phone, message)
+
+    if sms_sent:
+        return jsonify({'success': True, 'message': 'បានផ្ញើ OTP ទៅកាន់ទូរស័ព្ទរបស់អ្នក!'})
+    else:
+        # ===== Fallback: បង្ហាញ OTP ក្នុង Response =====
+        return jsonify({
+            'success': True,
+            'message': f'OTP: {otp_code} (សម្រាប់សាកល្បង - មិនអាចផ្ញើ SMS បាន)'
+        })
+
+# ============================================
+# API: VERIFY OTP
+# ============================================
+@app.route('/api/verify-otp', methods=['POST'])
+def api_verify_otp():
+    """ផ្ទៀងផ្ទាត់ OTP និងបង្កើតពាក្យសម្ងាត់ថ្មី"""
+    data = request.json
+    username = data.get('username', '').strip()
+    phone = data.get('phone', '').strip()
+    otp_code = data.get('otp', '').strip()
+
+    if not username or not phone or not otp_code:
+        return jsonify({'success': False, 'error': 'សូមបំពេញព័ត៌មានទាំងអស់!'})
+
+    if len(otp_code) != 6:
+        return jsonify({'success': False, 'error': 'OTP ត្រូវមាន 6 ខ្ទង់!'})
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT u.id, u.username
+        FROM otp_codes o
+        JOIN users u ON o.user_id = u.id
+        WHERE u.username = ? AND o.phone = ?
+        AND o.otp_code = ?
+        AND o.is_used = 0
+        AND o.expires_at > ?
+        ORDER BY o.id DESC LIMIT 1
+    ''', (username, phone, otp_code, get_cambodia_time_str()))
+
+    otp = cursor.fetchone()
+
+    if not otp:
+        conn.close()
+        return jsonify({'success': False, 'error': 'OTP មិនត្រឹមត្រូវ ឬ ផុតកំណត់!'})
+
+    # ===== សម្គាល់ OTP ថាបានប្រើ =====
+    cursor.execute('UPDATE otp_codes SET is_used = 1 WHERE user_id = ?', (otp['id'],))
+
+    # ===== បង្កើតពាក្យសម្ងាត់ថ្មី =====
+    new_password = generate_random_password(10)
+    cursor.execute('UPDATE users SET password = ? WHERE id = ?', (new_password, otp['id']))
+    conn.commit()
+    conn.close()
+
+    log_audit(
+        action='ស្នើសុំពាក្យសម្ងាត់ថ្មី (OTP)',
+        module='ប្រព័ន្ធ',
+        record_id=otp['id'],
+        details=f"អ្នកប្រើប្រាស់ {username} បានស្នើសុំពាក្យសម្ងាត់ថ្មីតាម OTP"
+    )
+
+    return jsonify({
+        'success': True,
+        'message': f'បានកំណត់ពាក្យសម្ងាត់ថ្មីរួចរាល់!',
+        'new_password': new_password  # ← បន្ថែមនេះ
+    })
+
+
+# ============================================
+# FAVICON
 # ============================================
 @app.route('/favicon.ico')
 def favicon():
-    """បម្រើ favicon ដោយប្រើ SVG ដើម្បីកុំឲ្យមាន 404"""
     svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
         <rect width="100" height="100" rx="20" fill="#1a1a2e"/>
         <text x="50" y="72" font-size="60" text-anchor="middle" font-family="Arial" fill="#FFD700">📊</text>
@@ -2178,12 +2375,12 @@ def favicon():
         'Cache-Control': 'public, max-age=86400'
     }
 
+
 # ============================================
-# MANIFEST.JSON - PWA
+# MANIFEST.JSON
 # ============================================
 @app.route('/manifest.json')
 def manifest():
-    """បម្រើ manifest.json សម្រាប់ PWA"""
     manifest_data = {
         "name": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល",
         "short_name": "គ្រប់គ្រងរដ្ឋបាល",
@@ -2211,12 +2408,12 @@ def manifest():
     }
     return jsonify(manifest_data)
 
+
 # ============================================
 # SERVICE WORKER
 # ============================================
 @app.route('/service-worker.js')
 def service_worker():
-    """បម្រើ service worker សម្រាប់ Offline"""
     js = '''// Service Worker - Offline Support
 const CACHE_NAME = 'admin-system-v1';
 const STATIC_FILES = [
@@ -2278,27 +2475,23 @@ console.log('Service Worker loaded successfully!');'''
         'Cache-Control': 'public, max-age=86400'
     }
 
+
 # ============================================
-# LOGO - បម្រើ Logo.png
+# LOGO
 # ============================================
 @app.route('/static/Logo.png')
 def serve_logo():
-    """បម្រើ Logo.png ប្រសិនបើមាន"""
     try:
         return send_file('static/Logo.png')
     except:
-        # Fallback: បង្កើតរូបភាពជាមួយ PIL
         try:
             from PIL import Image, ImageDraw, ImageFont
             import io
 
             img = Image.new('RGB', (200, 200), color='#1a1a2e')
             draw = ImageDraw.Draw(img)
-
-            # គូររាងមូល
             draw.rounded_rectangle([0, 0, 200, 200], radius=25, fill='#1a1a2e')
 
-            # គូរអក្សរ
             try:
                 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 100)
             except:
@@ -2306,7 +2499,6 @@ def serve_logo():
 
             draw.text((100, 100), "📊", fill='#FFD700', anchor="mm", font=font)
 
-            # រក្សាទុកក្នុង memory
             output = io.BytesIO()
             img.save(output, format='PNG')
             output.seek(0)
@@ -2314,60 +2506,12 @@ def serve_logo():
         except:
             return "Logo not available", 404
 
+
 # ============================================
 # API: CHANGE PASSWORD
 # ============================================
 @app.route('/api/change-password', methods=['POST'])
 @login_required
 def api_change_password():
-    """ប្តូរពាក្យសម្ងាត់របស់អ្នកប្រើប្រាស់"""
     data = request.json
-    current_password = data.get('current_password')
-    new_password = data.get('new_password')
-
-    if not current_password or not new_password:
-        return jsonify({'success': False, 'error': 'សូមបំពេញព័ត៌មានទាំងអស់!'})
-
-    if len(new_password) < 6:
-        return jsonify({'success': False, 'error': 'ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងហោចណាស់ 6 តួ!'})
-
-    conn = get_db()
-    cursor = conn.cursor()
-
-    # ពិនិត្យពាក្យសម្ងាត់បច្ចុប្បន្ន
-    user_id = session.get('user_id')
-    cursor.execute('SELECT password FROM users WHERE id = ?', (user_id,))
-    row = cursor.fetchone()
-
-    if not row:
-        conn.close()
-        return jsonify({'success': False, 'error': 'មិនឃើញអ្នកប្រើប្រាស់!'})
-
-    if row['password'] != current_password:
-        conn.close()
-        return jsonify({'success': False, 'error': 'ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវ!'})
-
-    # ប្តូរពាក្យសម្ងាត់
-    cursor.execute('UPDATE users SET password = ? WHERE id = ?', (new_password, user_id))
-    conn.commit()
-    conn.close()
-
-    # ===== កត់ត្រាសកម្មភាព =====
-    log_audit(
-        action='ប្តូរពាក្យសម្ងាត់',
-        module='ប្រព័ន្ធ',
-        details=f"អ្នកប្រើប្រាស់ {session.get('username')} បានប្តូរពាក្យសម្ងាត់"
-    )
-
-    return jsonify({'success': True, 'message': 'បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!'})
-
-# ============================================
-# INIT DATABASE
-# ============================================
-init_db()
-
-# ============================================
-# RUN APP
-# ============================================
-if __name__ == '__main__':
-    app.run(debug=True)
+    current_passwor
