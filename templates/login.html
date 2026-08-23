@@ -1,104 +1,84 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#FFD700">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ចូលប្រើប្រាស់ - ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</title>
     <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Khmer', 'Khmer OS', sans-serif;
-            background: #0f1123;
+            background: #0d1117;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-
         .login-container {
-            background: #1a1a2e;
+            background: #161b22;
+            border: 1px solid rgba(255, 215, 0, 0.2);
             padding: 35px 30px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             width: 100%;
             max-width: 400px;
-            border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
         }
-
         .login-logo img {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             object-fit: contain;
             border-radius: 50%;
-            margin-bottom: 12px;
-            background: rgba(255,255,255,0.05);
-            padding: 5px;
+            margin-bottom: 10px;
         }
-
         .login-logo .logo-icon {
-            font-size: 60px;
+            font-size: 55px;
             display: block;
             margin-bottom: 10px;
             color: #FFD700;
         }
-
         .login-logo .brand-name {
             font-size: 18px;
             font-weight: bold;
             color: #ffffff;
             display: block;
         }
-
         .divider {
             height: 1px;
             background: rgba(255, 215, 0, 0.2);
             margin: 15px 0 20px;
         }
-
         .form-group {
             margin-bottom: 16px;
             text-align: left;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            color: #e0e0e0;
+            color: #c9d1d9;
             font-size: 13px;
         }
-
-        .form-group .input-wrapper {
+        .input-wrapper {
             position: relative;
             display: flex;
             align-items: center;
-            background: #252542;
+            background: #0d1117;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.15);
+            border: 1px solid #30363d;
         }
-
-        .form-group .input-wrapper i {
+        .input-wrapper:focus-within {
+            border-color: #FFD700;
+        }
+        .input-wrapper i {
             position: absolute;
             left: 14px;
             color: #FFD700;
             font-size: 15px;
         }
-
-        .form-group input {
+        .input-wrapper input {
             width: 100%;
             padding: 12px 14px 12px 42px;
             background: transparent;
@@ -108,12 +88,11 @@
             font-family: 'Khmer', sans-serif;
             outline: none;
         }
-
         .login-btn {
             width: 100%;
             padding: 13px;
             background: #FFD700;
-            color: #0a0a0f;
+            color: #0d1117;
             border: none;
             border-radius: 10px;
             font-size: 16px;
@@ -123,45 +102,119 @@
             margin-top: 10px;
             transition: 0.3s;
         }
-
         .login-btn:hover {
             background: #e6c200;
         }
-
-        .error-message {
-            background: rgba(231, 76, 60, 0.2);
-            color: #ff6b6b;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            border: 1px solid #e74c3c;
-        }
-
         .forgot-password-link {
             text-align: right;
             margin-top: 8px;
+            margin-bottom: 5px;
         }
-
         .forgot-password-link a {
-            color: #4dabf7;
+            color: #58a6ff;
             font-size: 13px;
             text-decoration: none;
             cursor: pointer;
         }
-
         .forgot-password-link a:hover {
             text-decoration: underline;
         }
-
+        .error-message {
+            background: rgba(231, 76, 60, 0.2);
+            color: #ff7b72;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border: 1px solid #f85149;
+        }
         .login-footer {
             margin-top: 20px;
-            color: rgba(255,255,255,0.4);
+            color: #8b949e;
             font-size: 12px;
         }
-        
         .login-footer strong {
             color: #FFD700;
+        }
+
+        /* ===== OTP MODAL ===== */
+        .modal-otp {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-otp.active { display: flex; }
+        .modal-content {
+            background: #161b22;
+            border: 1px solid rgba(255,215,0,0.3);
+            padding: 30px 25px;
+            border-radius: 16px;
+            max-width: 380px;
+            width: 100%;
+            position: relative;
+            text-align: center;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #8b949e;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #ff7b72; }
+        .modal-title {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            outline: none;
+            font-family: 'Khmer', sans-serif;
+        }
+        .modal-input:focus { border-color: #FFD700; }
+        .btn-otp {
+            width: 100%;
+            padding: 12px;
+            background: #FFD700;
+            color: #0d1117;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Khmer', sans-serif;
+            margin-top: 5px;
+        }
+        .new-pass-box {
+            background: #0d1117;
+            border: 1px dashed #FFD700;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .new-pass-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #FFD700;
+            letter-spacing: 2px;
         }
     </style>
 </head>
@@ -199,6 +252,12 @@
                 </div>
             </div>
 
+            <div class="forgot-password-link">
+                <a onclick="openOTPModal()">
+                    <i class="fas fa-key"></i> ភ្លេចពាក្យសម្ងាត់?
+                </a>
+            </div>
+
             <button type="submit" class="login-btn">
                 <i class="fas fa-sign-in-alt"></i> ចូលប្រើប្រាស់
             </button>
@@ -209,5 +268,110 @@
         </div>
     </div>
 
+    <!-- ===== OTP MODAL ===== -->
+    <div class="modal-otp" id="otpModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeOTPModal()">&times;</button>
+            <div class="modal-title"><i class="fas fa-key" style="color:#FFD700;"></i> ស្នើសុំ OTP</div>
+
+            <!-- STEP 1: Request -->
+            <div id="stepRequest">
+                <input type="text" id="otpUsername" class="modal-input" placeholder="ឈ្មោះអ្នកប្រើប្រាស់ (Username)" required>
+                <input type="tel" id="otpPhone" class="modal-input" placeholder="លេខទូរស័ព្ទ (Phone)" required>
+                <div id="otpReqError" style="color:#ff7b72; font-size:12px; margin-bottom:8px; display:none;"></div>
+                <button type="button" class="btn-otp" onclick="requestOTP()">
+                    <i class="fas fa-paper-plane"></i> ផ្ញើ OTP
+                </button>
+            </div>
+
+            <!-- STEP 2: Verify -->
+            <div id="stepVerify" style="display:none;">
+                <input type="text" id="otpCode" class="modal-input" placeholder="បញ្ចូលលេខកូដ OTP 6 ខ្ទង់" maxlength="6">
+                <div id="otpVerifyError" style="color:#ff7b72; font-size:12px; margin-bottom:8px; display:none;"></div>
+
+                <div class="new-pass-box" id="newPassBox" style="display:none;">
+                    <div style="color:#8b949e; font-size:12px;">ពាក្យសម្ងាត់ថ្មីរបស់អ្នក៖</div>
+                    <div class="new-pass-text" id="newPassVal">Pass1234</div>
+                </div>
+
+                <button type="button" class="btn-otp" id="btnVerify" onclick="verifyOTP()">
+                    <i class="fas fa-check"></i> ផ្ទៀងផ្ទាត់
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openOTPModal() {
+            document.getElementById('otpModal').classList.add('active');
+            document.getElementById('stepRequest').style.display = 'block';
+            document.getElementById('stepVerify').style.display = 'none';
+            document.getElementById('newPassBox').style.display = 'none';
+        }
+        function closeOTPModal() {
+            document.getElementById('otpModal').classList.remove('active');
+        }
+
+        async function requestOTP() {
+            const username = document.getElementById('otpUsername').value.trim();
+            const phone = document.getElementById('otpPhone').value.trim();
+            const errDiv = document.getElementById('otpReqError');
+            errDiv.style.display = 'none';
+
+            if (!username || !phone) {
+                errDiv.textContent = 'សូមបំពេញព័ត៌មានទាំងអស់!';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, phone })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    document.getElementById('stepRequest').style.display = 'none';
+                    document.getElementById('stepVerify').style.display = 'block';
+                } else {
+                    errDiv.textContent = data.error || 'មានបញ្ហា!';
+                    errDiv.style.display = 'block';
+                }
+            } catch (e) {
+                errDiv.textContent = 'មិនអាចភ្ជាប់ទៅកាន់ Server!';
+                errDiv.style.display = 'block';
+            }
+        }
+
+        async function verifyOTP() {
+            const username = document.getElementById('otpUsername').value.trim();
+            const phone = document.getElementById('otpPhone').value.trim();
+            const otp = document.getElementById('otpCode').value.trim();
+            const errDiv = document.getElementById('otpVerifyError');
+            errDiv.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, phone, otp })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('newPassVal').textContent = data.new_password;
+                    document.getElementById('newPassBox').style.display = 'block';
+                    document.getElementById('btnVerify').style.display = 'none';
+                } else {
+                    errDiv.textContent = data.error || 'OTP មិនត្រឹមត្រូវ!';
+                    errDiv.style.display = 'block';
+                }
+            } catch (e) {
+                errDiv.textContent = 'មានបញ្ហាក្នុងការផ្ទៀងផ្ទាត់!';
+                errDiv.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
