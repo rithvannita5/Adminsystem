@@ -3,7 +3,7 @@
 <head>
 <style>
 /* ============================================================
-   SIDEBAR STYLES - ទាំងអស់ក្នុងឯកសារតែមួយ
+   SIDEBAR STYLES
    ============================================================ */
 
 /* ===== SIDEBAR ===== */
@@ -27,24 +27,31 @@
 
 /* ===== SIDEBAR BRAND ===== */
 .sidebar-brand {
-    padding: 20px 20px 20px;
+    padding: 20px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
     text-align: center;
 }
 
 /* ===== LOGO ===== */
 .logo-wrapper {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    min-height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    background: rgba(255,255,255,0.03);
 }
 
 .sidebar-logo {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
-    border-radius: 12px;
+    display: block;
 }
 
 /* ===== BRAND TEXT ===== */
@@ -53,7 +60,7 @@
 }
 
 .brand-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 0.5px;
@@ -141,7 +148,7 @@
     position: relative;
 }
 
-/* ===== ICON COLORS - ពណ៌ផ្សេងគ្នាសម្រាប់ Menu នីមួយៗ ===== */
+/* ===== ICON COLORS ===== */
 .sidebar-menu a .menu-icon {
     width: 20px;
     text-align: center;
@@ -150,7 +157,6 @@
     transition: all 0.3s ease;
 }
 
-/* ===== ពណ៌រូបតំណាងតាម Menu ===== */
 .sidebar-menu a .menu-icon.dashboard { color: #FFD700; }
 .sidebar-menu a .menu-icon.income { color: #4CAF50; }
 .sidebar-menu a .menu-icon.expense { color: #FF6B6B; }
@@ -501,17 +507,9 @@
     max-width: 400px;
 }
 
-.toast-notification.success {
-    background: #27ae60;
-}
-
-.toast-notification.error {
-    background: #e74c3c;
-}
-
-.toast-notification.info {
-    background: #2980b9;
-}
+.toast-notification.success { background: #27ae60; }
+.toast-notification.error { background: #e74c3c; }
+.toast-notification.info { background: #2980b9; }
 
 @keyframes toastSlide {
     from { opacity: 0; transform: translateY(20px); }
@@ -574,11 +572,17 @@
     <div class="sidebar-brand">
         <!-- Logo -->
         <div class="logo-wrapper">
-            <img src="/static/Logo.png" alt="Logo" class="sidebar-logo">
+            <img src="/static/Logo.png" 
+                 alt="Logo" 
+                 class="sidebar-logo"
+                 width="70"
+                 height="70"
+                 loading="eager"
+                 decoding="sync">
         </div>
-        <!-- អក្សរ ១ ជួរ -->
+        <!-- Brand Title -->
         <div class="brand-text">
-            <span class="brand-title">ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</span>
+            <span class="brand-title">រដ្ឋបាលសង្កាត់ដងទង់</span>
         </div>
     </div>
 
@@ -605,7 +609,7 @@
         <a href="/income" class="{% if request.endpoint == 'income' %}active{% endif %}">
             <i class="fas fa-file-import menu-icon income"></i>
             <span class="menu-text">ឯកសារចូល</span>
-            {% if income_count > 0 %}
+            {% if income_count and income_count > 0 %}
             <span class="badge">{{ income_count }}</span>
             {% endif %}
         </a>
@@ -616,7 +620,7 @@
         <a href="/expense" class="{% if request.endpoint == 'expense' %}active{% endif %}">
             <i class="fas fa-file-export menu-icon expense"></i>
             <span class="menu-text">ឯកសារចេញ</span>
-            {% if expense_count > 0 %}
+            {% if expense_count and expense_count > 0 %}
             <span class="badge">{{ expense_count }}</span>
             {% endif %}
         </a>
@@ -635,7 +639,7 @@
         <a href="/customers" class="{% if request.endpoint == 'customers' %}active{% endif %}">
             <i class="fas fa-users menu-icon customers"></i>
             <span class="menu-text">របកអតិថិជន</span>
-            {% if total_customers > 0 %}
+            {% if total_customers and total_customers > 0 %}
             <span class="badge">{{ total_customers }}</span>
             {% endif %}
         </a>
@@ -670,7 +674,7 @@
         <a href="/employees" class="{% if request.endpoint == 'employees' %}active{% endif %}">
             <i class="fas fa-user-tie menu-icon employees"></i>
             <span class="menu-text">គ្រប់គ្រងបុគ្គលិក</span>
-            {% if employee_count > 0 %}
+            {% if employee_count and employee_count > 0 %}
             <span class="badge">{{ employee_count }}</span>
             {% endif %}
         </a>
@@ -781,7 +785,6 @@
     // ============================================================
     // CHANGE PASSWORD FUNCTIONS
     // ============================================================
-
     function openChangePassword() {
         document.getElementById('changePasswordModal').classList.add('active');
         document.getElementById('changePasswordForm').reset();
@@ -797,18 +800,12 @@
         document.getElementById('changePasswordModal').classList.remove('active');
     }
 
-    // Close modal when clicking outside
     document.getElementById('changePasswordModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeChangePassword();
-        }
+        if (e.target === this) closeChangePassword();
     });
 
-    // Close with Escape key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeChangePassword();
-        }
+        if (e.key === 'Escape') closeChangePassword();
     });
 
     async function submitChangePassword(event) {
@@ -821,7 +818,6 @@
         const successMessage = document.getElementById('successMessage');
         const submitBtn = document.getElementById('changePasswordBtn');
 
-        // ===== Validate =====
         errorMessage.classList.remove('show');
         successMessage.classList.remove('show');
         errorMessage.textContent = '';
@@ -839,16 +835,13 @@
             return;
         }
 
-        // ===== Submit =====
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> កំពុងរក្សាទុក...';
 
         try {
             const response = await fetch('/api/change-password', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     current_password: currentPassword,
                     new_password: newPassword
@@ -879,7 +872,6 @@
         submitBtn.innerHTML = '<i class="fas fa-save"></i> រក្សាទុក';
     }
 
-    // ===== TOAST NOTIFICATION =====
     function showToast(message, type = 'success') {
         const existing = document.querySelector('.toast-notification');
         if (existing) existing.remove();
@@ -896,6 +888,5 @@
         }, 4000);
     }
 </script>
-
 </body>
 </html>
