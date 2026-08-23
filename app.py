@@ -2551,7 +2551,7 @@ def api_change_password():
     return jsonify({'success': True, 'message': 'បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!'})
 
 # ============================================
-# TWILIO SMS VIA REQUESTS (NO LIBRARY)
+# TWILIO SMS (NO EXTERNAL SDK)
 # ============================================
 import requests
 import base64
@@ -2563,13 +2563,14 @@ TWILIO_CONFIG = {
 }
 
 def send_sms(phone, message):
-    """ផ្ញើ SMS តាមរយៈ Twilio API"""
+    """ផ្ញើ SMS តាមរយៈ Twilio REST API"""
     try:
-        if not phone.startswith('+'):
-            if phone.startswith('0'):
-                phone = '+855' + phone[1:]
-            else:
-                phone = '+855' + phone
+        # បំប្លែងលេខទូរស័ព្ទទៅជាទម្រង់អន្តរជាតិ (+855)
+        clean_phone = phone.strip()
+        if clean_phone.startswith('0'):
+            clean_phone = '+855' + clean_phone[1:]
+        elif not clean_phone.startswith('+'):
+            clean_phone = '+855' + clean_phone
 
         url = f"https://api.twilio.com/2010-04-01/Accounts/{TWILIO_CONFIG['account_sid']}/Messages.json"
         auth_string = f"{TWILIO_CONFIG['account_sid']}:{TWILIO_CONFIG['auth_token']}"
@@ -2577,7 +2578,7 @@ def send_sms(phone, message):
 
         data = {
             'From': TWILIO_CONFIG['from_phone'],
-            'To': phone,
+            'To': clean_phone,
             'Body': message
         }
         headers = {
@@ -2586,9 +2587,10 @@ def send_sms(phone, message):
         }
 
         response = requests.post(url, data=data, headers=headers)
+        print(f"Twilio Response: {response.status_code} - {response.text}")
         return response.status_code == 201
     except Exception as e:
-        print(f"❌ Error sending SMS: {e}")
+        print(f"SMS Error: {e}")
         return False
 
 
