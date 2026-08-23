@@ -59,7 +59,7 @@ def get_local_ip():
 
 # ===== APP INIT =====
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = 'admin_system_super_secret_static_key_2026'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
 
 
