@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* ============================================================
+   SIDEBAR STYLES - ទាំងអស់ក្នុងឯកសារតែមួយ
+   ============================================================ */
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 280px;
+    background: #0a0a0f;
+    color: #ffffff;
+    padding: 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+/* ===== SIDEBAR BRAND ===== */
+.sidebar-brand {
+    padding: 20px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+}
+
+/* ===== LOGO ===== */
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.sidebar-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+/* ===== BRAND TEXT ===== */
+.brand-text {
+    display: block;
+}
+
+.brand-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    font-family: 'Khmer OS', 'Khmer', 'Moul', serif;
+    line-height: 1.3;
+    display: block;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 15px;
+    margin: 12px 15px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.theme-toggle .toggle-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+}
+
+.toggle-switch {
+    width: 50px;
+    height: 26px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 13px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.toggle-switch.active {
+    background: #FFD700;
+}
+
+.toggle-switch .toggle-slider {
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.toggle-switch.active .toggle-slider {
+    transform: translateX(24px);
+}
+
+/* ===== SIDEBAR MENU ===== */
+.sidebar-menu {
+    padding: 20px 12px;
+}
+
+.sidebar-menu .menu-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+    padding: 10px 14px 8px;
+    font-weight: 600;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    gap: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    position: relative;
+}
+
+/* ===== ICON COLORS - ពណ៌ផ្សេងគ្នាសម្រាប់ Menu នីមួយៗ ===== */
+.sidebar-menu a .menu-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+/* ===== ពណ៌រូបតំណាងតាម Menu ===== */
+.sidebar-menu a .menu-icon.dashboard { color: #FFD700; }
+.sidebar-menu a .menu-icon.income { color: #4CAF50; }
+.sidebar-menu a .menu-icon.expense { color: #FF6B6B; }
+.sidebar-menu a .menu-icon.income-budget { color: #00BCD4; }
+.sidebar-menu a .menu-icon.customers { color: #9C27B0; }
+.sidebar-menu a .menu-icon.expense-budget { color: #FF9800; }
+.sidebar-menu a .menu-icon.total-budget { color: #E91E63; }
+.sidebar-menu a .menu-icon.info { color: #2196F3; }
+.sidebar-menu a .menu-icon.employees { color: #3F51B5; }
+.sidebar-menu a .menu-icon.settings { color: #78909C; }
+
+/* ===== HOVER EFFECT ===== */
+.sidebar-menu a:hover {
+    background: rgba(255,255,255,0.06);
+    color: #ffffff;
+}
+
+.sidebar-menu a:hover .menu-icon {
+    transform: scale(1.2) rotate(-5deg);
+}
+
+.sidebar-menu a .menu-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-menu a .badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar-menu a:hover .badge {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+}
+
+/* ===== ACTIVE STATE ===== */
+.sidebar-menu a.active {
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+}
+
+.sidebar-menu a.active .menu-icon {
+    color: #FFD700 !important;
+    transform: scale(1.1);
+}
+
+.sidebar-menu a.active .badge {
+    background: rgba(255,215,0,0.15);
+    color: #FFD700;
+}
+
+/* ===== SIDEBAR FOOTER ===== */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 10px;
+}
+
+.sidebar-footer .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.sidebar-footer .user-info .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a0a0f;
+    flex-shrink: 0;
+}
+
+.sidebar-footer .user-info .user-details {
+    flex: 1;
+}
+
+.sidebar-footer .user-info .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+}
+
+.sidebar-footer .user-info .role {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+}
+
+/* ===== CHANGE PASSWORD BUTTON ===== */
+.sidebar-footer .user-info .change-password-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+}
+
+.sidebar-footer .user-info .change-password-btn:hover {
+    background: rgba(255,215,0,0.1);
+    border-color: rgba(255,215,0,0.3);
+    color: #FFD700;
+}
+
+.sidebar-footer .user-info .change-password-btn i {
+    margin-right: 4px;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.sidebar-footer .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+}
+
+.sidebar-footer .logout-btn:hover {
+    background: rgba(255,0,0,0.08);
+    color: rgba(255,255,255,0.7);
+}
+
+.sidebar-footer .logout-btn i {
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer .version-info {
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 1px;
+    margin-top: 15px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* ===== CHANGE PASSWORD MODAL ===== */
+.modal-change-password {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-change-password.active {
+    display: flex;
+}
+
+.modal-change-password .modal-content {
+    background: var(--card-bg, #1e1e3a);
+    padding: 35px 30px;
+    border-radius: 16px;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    animation: modalSlideDown 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+@keyframes modalSlideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-change-password .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 28px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.3);
+    transition: color 0.3s;
+    background: none;
+    border: none;
+}
+
+.modal-change-password .modal-close:hover {
+    color: #e74c3c;
+}
+
+.modal-change-password .modal-title {
+    color: #ffffff;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 15px;
+}
+
+.modal-change-password .modal-title i {
+    color: #FFD700;
+    margin-right: 10px;
+}
+
+.modal-change-password .form-group {
+    margin-bottom: 15px;
+}
+
+.modal-change-password .form-group label {
+    display: block;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.modal-change-password .form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: #ffffff;
+    font-size: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    transition: border-color 0.3s;
+}
+
+.modal-change-password .form-group input:focus {
+    outline: none;
+    border-color: #FFD700;
+}
+
+.modal-change-password .form-group input::placeholder {
+    color: rgba(255,255,255,0.2);
+}
+
+.modal-change-password .btn-submit {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 5px;
+}
+
+.modal-change-password .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+}
+
+.modal-change-password .btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.modal-change-password .error-message {
+    color: #ff6b6b;
+    font-size: 13px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    text-align: center;
+    margin-top: 10px;
+    display: none;
+}
+
+.modal-change-password .error-message.show {
+    display: block;
+}
+
+.modal-change-password .success-message {
+    color: #2ecc71;
+    font-size: 13px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    text-align: center;
+    margin-top: 10px;
+    display: none;
+}
+
+.modal-change-password .success-message.show {
+    display: block;
+}
+
+/* ===== OVERLAY ===== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ===== TOAST NOTIFICATION ===== */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    font-size: 14px;
+    z-index: 99999;
+    animation: toastSlide 0.5s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    max-width: 400px;
+}
+
+.toast-notification.success {
+    background: #27ae60;
+}
+
+.toast-notification.error {
+    background: #e74c3c;
+}
+
+.toast-notification.info {
+    background: #2980b9;
+}
+
+@keyframes toastSlide {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .sidebar-logo {
+        width: 50px;
+        height: 50px;
+    }
+    .brand-title {
+        font-size: 14px;
+    }
+    .sidebar-footer .user-info .change-password-btn {
+        position: static;
+        transform: none;
+        margin-top: 5px;
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .sidebar-footer .user-info {
+        flex-wrap: wrap;
+    }
+    .modal-change-password .modal-content {
+        padding: 25px 20px;
+        margin: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-change-password .modal-content {
+        padding: 20px 15px;
+    }
+    .modal-change-password .modal-title {
+        font-size: 17px;
+    }
+    .modal-change-password .form-group input {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR HTML
+     ============================================================ -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <!-- Logo -->
+        <div class="logo-wrapper">
+            <img src="/static/Logo.png" alt="Logo" class="sidebar-logo">
+        </div>
+        <!-- អក្សរ ១ ជួរ -->
+        <div class="brand-text">
+            <span class="brand-title">ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</span>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <span class="toggle-label"><i class="fas fa-sun"></i></span>
+        <div class="toggle-switch" id="themeToggle" onclick="toggleTheme()">
+            <div class="toggle-slider"></div>
+        </div>
+        <span class="toggle-label"><i class="fas fa-moon"></i></span>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="menu-label">ម៉ឺនុយ</div>
+
+        <!-- 1. Dashboard -->
+        <a href="/dashboard" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-th-large menu-icon dashboard"></i>
+            <span class="menu-text">Dashboard</span>
+        </a>
+
+        <!-- 2. ឯកសារចូល -->
+        {% if 'all' in permissions or 'income_bank_view' in permissions or 'income_land_view' in permissions or 'income_home_view' in permissions or 'income_wedding_view' in permissions or 'income_other_view' in permissions %}
+        <a href="/income" class="{% if request.endpoint == 'income' %}active{% endif %}">
+            <i class="fas fa-file-import menu-icon income"></i>
+            <span class="menu-text">ឯកសារចូល</span>
+            {% if income_count > 0 %}
+            <span class="badge">{{ income_count }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+
+        <!-- 3. ឯកសារចេញ -->
+        {% if 'all' in permissions or 'expense_view' in permissions or 'expense_report_view' in permissions or 'expense_decision_view' in permissions or 'expense_warrant_view' in permissions or 'expense_financial_view' in permissions or 'expense_other_view' in permissions %}
+        <a href="/expense" class="{% if request.endpoint == 'expense' %}active{% endif %}">
+            <i class="fas fa-file-export menu-icon expense"></i>
+            <span class="menu-text">ឯកសារចេញ</span>
+            {% if expense_count > 0 %}
+            <span class="badge">{{ expense_count }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+
+        <!-- 4. ថវិកាចូល -->
+        {% if 'all' in permissions or 'income_budget_view' in permissions %}
+        <a href="/income-budget" class="{% if request.endpoint == 'income_budget' %}active{% endif %}">
+            <i class="fas fa-coins menu-icon income-budget"></i>
+            <span class="menu-text">ថវិកាចូល</span>
+        </a>
+        {% endif %}
+
+        <!-- 5. របកអតិថិជន -->
+        {% if 'all' in permissions or 'customers_view' in permissions %}
+        <a href="/customers" class="{% if request.endpoint == 'customers' %}active{% endif %}">
+            <i class="fas fa-users menu-icon customers"></i>
+            <span class="menu-text">របកអតិថិជន</span>
+            {% if total_customers > 0 %}
+            <span class="badge">{{ total_customers }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+
+        <!-- 6. ថវិកាចេញ -->
+        {% if 'all' in permissions or 'expense_budget_view' in permissions %}
+        <a href="/expense-budget" class="{% if request.endpoint == 'expense_budget' %}active{% endif %}">
+            <i class="fas fa-money-bill-wave menu-icon expense-budget"></i>
+            <span class="menu-text">ថវិកាចេញ</span>
+        </a>
+        {% endif %}
+
+        <!-- 7. ថវិការសរុប -->
+        {% if 'all' in permissions or 'total_budget_view' in permissions %}
+        <a href="/total-budget" class="{% if request.endpoint == 'total_budget' %}active{% endif %}">
+            <i class="fas fa-chart-pie menu-icon total-budget"></i>
+            <span class="menu-text">ថវិការសរុប</span>
+        </a>
+        {% endif %}
+
+        <!-- 8. ពត៌មាន -->
+        {% if 'all' in permissions or 'info_view' in permissions %}
+        <a href="/info" class="{% if request.endpoint == 'info' %}active{% endif %}">
+            <i class="fas fa-info-circle menu-icon info"></i>
+            <span class="menu-text">ពត៌មាន</span>
+        </a>
+        {% endif %}
+
+        <!-- 9. គ្រប់គ្រងបុគ្គលិក -->
+        {% if 'all' in permissions or 'employees_view' in permissions %}
+        <a href="/employees" class="{% if request.endpoint == 'employees' %}active{% endif %}">
+            <i class="fas fa-user-tie menu-icon employees"></i>
+            <span class="menu-text">គ្រប់គ្រងបុគ្គលិក</span>
+            {% if employee_count > 0 %}
+            <span class="badge">{{ employee_count }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+
+        <!-- 10. ការកំណត់ -->
+        {% if 'all' in permissions or 'settings_view' in permissions %}
+        <a href="/settings" class="{% if request.endpoint == 'settings' %}active{% endif %}">
+            <i class="fas fa-cog menu-icon settings"></i>
+            <span class="menu-text">ការកំណត់</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="avatar">{{ username[0]|upper }}</div>
+            <div class="user-details">
+                <div class="name">{{ username }}</div>
+                <div class="role">អ្នកប្រើប្រាស់</div>
+            </div>
+            <!-- ===== CHANGE PASSWORD BUTTON ===== -->
+            <button class="change-password-btn" onclick="openChangePassword()" title="ប្តូរពាក្យសម្ងាត់">
+                <i class="fas fa-key"></i> ប្តូរពាក្យសម្ងាត់
+            </button>
+        </div>
+        <a href="/logout" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>ចាកចេញ</span>
+        </a>
+        <div class="version-info">
+            ver. 20260814-dmMM
+        </div>
+    </div>
+</nav>
+
+<!-- ===== CHANGE PASSWORD MODAL ===== -->
+<div class="modal-change-password" id="changePasswordModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeChangePassword()">&times;</button>
+        <div class="modal-title">
+            <i class="fas fa-key"></i> ប្តូរពាក្យសម្ងាត់
+        </div>
+        <form id="changePasswordForm" onsubmit="submitChangePassword(event)">
+            <div class="form-group">
+                <label>ពាក្យសម្ងាត់បច្ចុប្បន្ន</label>
+                <input type="password" id="currentPassword" placeholder="បញ្ចូលពាក្យសម្ងាត់បច្ចុប្បន្ន" required>
+            </div>
+            <div class="form-group">
+                <label>ពាក្យសម្ងាត់ថ្មី</label>
+                <input type="password" id="newPassword" placeholder="បញ្ចូលពាក្យសម្ងាត់ថ្មី" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label>បញ្ជាក់ពាក្យសម្ងាត់ថ្មី</label>
+                <input type="password" id="confirmPassword" placeholder="បញ្ចូលពាក្យសម្ងាត់ថ្មីម្តងទៀត" required>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+            <button type="submit" class="btn-submit" id="changePasswordBtn">
+                <i class="fas fa-save"></i> រក្សាទុក
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== OVERLAY ===== -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+    // Theme Toggle
+    function toggleTheme() {
+        const body = document.body;
+        const toggle = document.getElementById('themeToggle');
+        body.classList.toggle('dark-theme');
+        toggle.classList.toggle('active');
+        localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+
+    // Sidebar Toggle
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside (Mobile)
+    document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('sidebar');
+        const hamburger = document.querySelector('.hamburger');
+        if (!sidebar || !hamburger) return;
+        if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && window.innerWidth <= 768) {
+            sidebar.classList.remove('open');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+    });
+
+    // Load saved theme
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            document.getElementById('themeToggle').classList.add('active');
+        }
+    });
+
+    // ============================================================
+    // CHANGE PASSWORD FUNCTIONS
+    // ============================================================
+
+    function openChangePassword() {
+        document.getElementById('changePasswordModal').classList.add('active');
+        document.getElementById('changePasswordForm').reset();
+        document.getElementById('errorMessage').classList.remove('show');
+        document.getElementById('successMessage').classList.remove('show');
+        document.getElementById('errorMessage').textContent = '';
+        document.getElementById('successMessage').textContent = '';
+        document.getElementById('changePasswordBtn').disabled = false;
+        document.getElementById('changePasswordBtn').innerHTML = '<i class="fas fa-save"></i> រក្សាទុក';
+    }
+
+    function closeChangePassword() {
+        document.getElementById('changePasswordModal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeChangePassword();
+        }
+    });
+
+    // Close with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeChangePassword();
+        }
+    });
+
+    async function submitChangePassword(event) {
+        event.preventDefault();
+
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const submitBtn = document.getElementById('changePasswordBtn');
+
+        // ===== Validate =====
+        errorMessage.classList.remove('show');
+        successMessage.classList.remove('show');
+        errorMessage.textContent = '';
+        successMessage.textContent = '';
+
+        if (newPassword.length < 6) {
+            errorMessage.textContent = 'ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងហោចណាស់ 6 តួ!';
+            errorMessage.classList.add('show');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            errorMessage.textContent = 'ពាក្យសម្ងាត់ថ្មី និងការបញ្ជាក់មិនត្រូវគ្នា!';
+            errorMessage.classList.add('show');
+            return;
+        }
+
+        // ===== Submit =====
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> កំពុងរក្សាទុក...';
+
+        try {
+            const response = await fetch('/api/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                successMessage.textContent = '✅ បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!';
+                successMessage.classList.add('show');
+                document.getElementById('changePasswordForm').reset();
+                showToast('✅ បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!', 'success');
+                setTimeout(() => {
+                    closeChangePassword();
+                }, 2000);
+            } else {
+                errorMessage.textContent = result.error || 'មានបញ្ហាក្នុងការប្តូរពាក្យសម្ងាត់!';
+                errorMessage.classList.add('show');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            errorMessage.textContent = 'មានបញ្ហាក្នុងការប្តូរពាក្យសម្ងាត់!';
+            errorMessage.classList.add('show');
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> រក្សាទុក';
+    }
+
+    // ===== TOAST NOTIFICATION =====
+    function showToast(message, type = 'success') {
+        const existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s';
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+</script>
+
+</body>
+</html>

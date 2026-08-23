@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <!-- ===== PWA MANIFEST ===== -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFD700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ===== FAVICON ===== -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a2e'/%3E%3Ctext x='50' y='72' font-size='60' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+<link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a2e'/%3E%3Ctext x='50' y='72' font-size='60' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ចូលប្រើប្រាស់ - ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</title>
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Khmer&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Khmer', 'Khmer OS', 'Moul', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===== BACKGROUND EFFECT ===== */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.03) 0%, transparent 70%);
+            animation: rotateBackground 30s linear infinite;
+        }
+
+        @keyframes rotateBackground {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            padding: 45px 40px 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            width: 420px;
+            max-width: 92%;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.08);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== LOGO ===== */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-logo img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            border-radius: 16px;
+            margin-bottom: 12px;
+        }
+
+        .login-logo .logo-icon {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        .login-logo .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            font-family: 'Khmer OS', 'Khmer', 'Moul', serif;
+            display: block;
+            line-height: 1.3;
+        }
+
+        .login-logo .brand-sub {
+            font-size: 12px;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,215,0,0.3), transparent);
+            margin: 20px 0 25px;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.7);
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.08);
+            transition: all 0.3s;
+        }
+
+        .form-group .input-wrapper:focus-within {
+            border-color: #FFD700;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-group .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            color: rgba(255,255,255,0.3);
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .form-group .input-wrapper:focus-within i {
+            color: #FFD700;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px 14px 48px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .form-group input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px rgba(10,10,15,0.9) inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+        }
+
+        /* ===== LOGIN BUTTON ===== */
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #0a0a0f;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.25);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn i {
+            margin-right: 10px;
+        }
+
+        /* ===== ERROR MESSAGE ===== */
+        .error-message {
+            background: rgba(231, 76, 60, 0.15);
+            color: #ff6b6b;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* ===== FOOTER ===== */
+        .login-footer {
+            text-align: center;
+            margin-top: 22px;
+        }
+
+        .login-footer .test-account {
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+
+        .login-footer .test-account strong {
+            color: rgba(255,215,0,0.5);
+            font-weight: 600;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 25px;
+            }
+            .login-logo img {
+                width: 60px;
+                height: 60px;
+            }
+            .login-logo .brand-name {
+                font-size: 17px;
+            }
+            .login-btn {
+                font-size: 16px;
+                padding: 14px;
+            }
+            .form-group input {
+                padding: 12px 15px 12px 42px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- ===== LOGO & BRAND ===== -->
+        <div class="login-logo">
+            <!-- Logo (ប្រើរូបភាព) -->
+            <img src="/static/Logo.png" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <!-- Fallback (បើគ្មានរូបភាព) -->
+            <span class="logo-icon" style="display:none;">📊</span>
+
+            <!-- ឈ្មោះប្រព័ន្ធ -->
+            <span class="brand-name">ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</span>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ===== ERROR MESSAGE ===== -->
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- ===== LOGIN FORM ===== -->
+        <form method="POST">
+            <div class="form-group">
+                <label><i class="fas fa-user" style="margin-right:8px;"></i> ឈ្មោះអ្នកប្រើប្រាស់</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="បញ្ចូលឈ្មោះអ្នកប្រើប្រាស់" required autofocus>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-lock" style="margin-right:8px;"></i> ពាក្យសម្ងាត់</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="បញ្ចូលពាក្យសម្ងាត់" required>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> ចូលប្រើប្រាស់
+            </button>
+        </form>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="login-footer">
+            <p class="test-account">
+                <i class="fas fa-info-circle" style="margin-right:5px;"></i>
+                ទំនាក់ទំនងលោក៖ <strong>សែត ពៅ</strong> </strong>
+            </p>
+        </div>
+    </div>
+<script>
+// ===== ចុះឈ្មោះ Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+            console.log('✅ Service Worker registered successfully!');
+
+            // ===== ពិនិត្យ Update =====
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('🔄 New Service Worker available!');
+                        // Reload page to use new version
+                        // window.location.reload();
+                    }
+                });
+            });
+        })
+        .catch(err => {
+            console.log('❌ Service Worker registration failed:', err);
+        });
+}
+
+// ===== ទទួលសារពី Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.type === 'ONLINE') {
+            console.log('📡', event.data.message);
+            // Show notification to user
+            // alert(event.data.message);
+        }
+    });
+}
+</script>
+</body>
+</html>
