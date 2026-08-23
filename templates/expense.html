@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ឯកសារចេញ - ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Khmer&display=swap');
+
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #ecf0f1;
+            --shadow-color: rgba(0,0,0,0.08);
+            --card-bg: #ffffff;
+            --header-bg: #ffffff;
+            --table-header-bg: #f8f9fa;
+            --table-header-text: #495057;
+            --table-border: #dee2e6;
+            --table-row-hover: #f8f9fa;
+            --table-row-even: #fafbfc;
+            --input-bg: #f0f2f5;
+            --input-border: #ecf0f1;
+            --transition-speed: 0.5s;
+        }
+
+        body.dark-theme {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #2a2a4a;
+            --shadow-color: rgba(0,0,0,0.3);
+            --card-bg: #1e1e3a;
+            --header-bg: #1a1a3a;
+            --table-header-bg: #1a1a3a;
+            --table-header-text: #b0b0b0;
+            --table-border: #2a2a4a;
+            --table-row-hover: rgba(255, 215, 0, 0.05);
+            --table-row-even: rgba(255, 255, 255, 0.02);
+            --input-bg: #2a2a4a;
+            --input-border: #3a3a5a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Khmer', 'Khmer OS', 'Moul', 'Arial', sans-serif;
+            background: var(--bg-primary);
+            display: flex;
+            min-height: 100vh;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #0a0a0f;
+            color: #ffffff;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        .sidebar-brand {
+            padding: 25px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon { font-size: 32px; color: #FFD700; }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-title { font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 1px; font-family: 'Arial', sans-serif; }
+        .brand-sub { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 15px;
+            margin: 10px 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .theme-toggle .toggle-label { font-size: 12px; color: rgba(255,255,255,0.4); font-family: 'Khmer', 'Khmer OS', sans-serif; }
+        .toggle-switch { width: 50px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 13px; cursor: pointer; position: relative; transition: background 0.3s; flex-shrink: 0; }
+        .toggle-switch.active { background: #FFD700; }
+        .toggle-switch .toggle-slider { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+        .sidebar-menu { padding: 20px 12px; }
+        .sidebar-menu .menu-label { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.25); letter-spacing: 2px; padding: 10px 14px 8px; font-weight: 600; }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 11px 16px;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            gap: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            position: relative;
+        }
+        .sidebar-menu a i { width: 20px; text-align: center; font-size: 16px; color: rgba(255,255,255,0.35); transition: color 0.25s ease; }
+        .sidebar-menu a span { flex: 1; }
+        .sidebar-menu a .badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.5);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+        .sidebar-menu a:hover i { color: rgba(255,255,255,0.7); }
+        .sidebar-menu a:hover .badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+        .sidebar-menu a.active { background: rgba(255,255,255,0.08); color: #ffffff; }
+        .sidebar-menu a.active i { color: #FFD700; }
+        .sidebar-menu a.active .badge { background: rgba(255,215,0,0.15); color: #FFD700; }
+
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom: 10px;
+        }
+        .sidebar-footer .user-info .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a0a0f;
+            flex-shrink: 0;
+        }
+        .sidebar-footer .user-info .name { font-size: 14px; font-weight: 500; color: #ffffff; font-family: 'Khmer', 'Khmer OS', sans-serif; }
+        .sidebar-footer .user-info .role { font-size: 11px; color: rgba(255,255,255,0.35); }
+        .sidebar-footer .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+        .sidebar-footer .logout-btn:hover { background: rgba(255,0,0,0.08); color: rgba(255,255,255,0.7); }
+        .sidebar-footer .logout-btn i { width: 20px; text-align: center; }
+        .sidebar-footer .version-info { text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 1px; margin-top: 15px; font-family: 'Arial', sans-serif; }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            min-height: 100vh;
+            transition: background var(--transition-speed);
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .top-header .page-title h1 { font-size: 24px; color: var(--text-primary); font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+        .top-header .page-title p { color: var(--text-secondary); font-size: 14px; font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .sub-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 2px 15px var(--shadow-color);
+            transition: background var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .sub-menu .btn-sub {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-menu .btn-sub:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .sub-menu .btn-sub.active { background: #1a237e; color: #FFD700; box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3); }
+        body.dark-theme .sub-menu .btn-sub.active { background: #FFD700; color: #1a237e; }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px var(--shadow-color);
+            overflow-x: auto;
+            transition: background var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-header .left-section { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .table-header h3 { color: var(--text-primary); font-family: 'Khmer', 'Khmer OS', sans-serif; font-size: 18px; margin: 0; transition: color var(--transition-speed); }
+        .table-header .right-section { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 0 15px;
+            border: 2px solid var(--input-border);
+            transition: all 0.3s;
+        }
+
+        .search-box:focus-within { border-color: #1a237e; box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1); }
+        .search-box i { color: var(--text-secondary); font-size: 16px; }
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            width: 220px;
+            outline: none;
+            color: var(--text-primary);
+        }
+        .search-box input::placeholder { color: var(--text-secondary); }
+        .search-box .clear-search { cursor: pointer; color: var(--text-secondary); padding: 5px; display: none; }
+        .search-box .clear-search:hover { color: #d32f2f; }
+
+        .btn-export {
+            padding: 10px 20px;
+            background: #1a7e3a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-export:hover {
+            background: #145a2a;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(26, 126, 58, 0.3);
+        }
+
+        .btn-add {
+            padding: 10px 25px;
+            background: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-add:hover { background: #d35400; transform: scale(1.02); box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 13px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--table-border);
+        }
+
+        table thead {
+            background: var(--table-header-bg);
+            border-bottom: 2px solid var(--table-border);
+        }
+
+        table thead th {
+            padding: 14px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--table-header-text);
+            border-right: 1px solid var(--table-border);
+            border-bottom: 2px solid var(--table-border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            transition: color var(--transition-speed), background var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        table thead th:last-child { border-right: none; }
+
+        table tbody td {
+            padding: 12px 10px;
+            text-align: center;
+            border-right: 1px solid var(--table-border);
+            border-bottom: 1px solid var(--table-border);
+            color: var(--text-primary);
+            vertical-align: middle;
+            transition: color var(--transition-speed), border-color var(--transition-speed), background var(--transition-speed);
+            background: var(--card-bg);
+        }
+
+        table tbody td:last-child { border-right: none; }
+
+        table tbody tr:hover td { background: var(--table-row-hover); }
+        table tbody tr:nth-child(even) td { background: var(--table-row-even); }
+        table tbody tr:nth-child(even):hover td { background: var(--table-row-hover); }
+
+        .table-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-secondary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+
+        .table-empty i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+
+        .highlight-text {
+            background: #FFD700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #1a237e;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.info { background: #d1ecf1; color: #0c5460; }
+        body.dark-theme .status-badge.info { background: #1a2a3a; color: #70d0ff; }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            margin: 2px 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-weight: 500;
+        }
+
+        .action-btn.edit { background: #e8f0fe; color: #1a73e8; }
+        .action-btn.edit:hover { background: #d2e3fc; transform: scale(1.05); }
+        .action-btn.delete { background: #fce8e6; color: #d93025; }
+        .action-btn.delete:hover { background: #fad2cf; transform: scale(1.05); }
+
+        body.dark-theme .action-btn.edit { background: #1a2a4a; color: #4dabf7; }
+        body.dark-theme .action-btn.edit:hover { background: #1a3a5a; }
+        body.dark-theme .action-btn.delete { background: #4a1a1a; color: #ff6b6b; }
+        body.dark-theme .action-btn.delete:hover { background: #5a1a1a; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideDown 0.3s ease;
+            transition: background var(--transition-speed);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            background: none;
+            border: none;
+        }
+
+        .modal-content .modal-close:hover { color: #d32f2f; }
+        .modal-content h2 {
+            color: var(--text-primary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            color: var(--text-primary);
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: color var(--transition-speed);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            transition: border-color 0.3s, background var(--transition-speed), color var(--transition-speed);
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #1a237e; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background: #0d1442; }
+        .btn-submit.update { background: #f39c12; }
+        .btn-submit.update:hover { background: #e67e22; }
+        body.dark-theme .btn-submit { background: #FFD700; color: #1a237e; }
+        body.dark-theme .btn-submit:hover { background: #f0c000; }
+
+        .calculated-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a237e;
+            padding: 8px 15px;
+            background: rgba(26, 35, 126, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        body.dark-theme .calculated-total { color: #FFD700; background: rgba(255, 215, 0, 0.1); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .hamburger { display: block; }
+            .sub-menu { flex-direction: column; }
+            .sub-menu .btn-sub { justify-content: center; }
+            .form-row { grid-template-columns: 1fr; }
+            table { font-size: 12px; }
+            table thead th, table tbody td { padding: 6px 5px; }
+            .table-header { flex-direction: column; align-items: stretch; }
+            .table-header .left-section { flex-direction: column; align-items: stretch; }
+            .table-header .right-section { flex-direction: column; align-items: stretch; }
+            .search-box input { width: 100%; }
+            .btn-add { justify-content: center; }
+            .btn-export { justify-content: center; }
+        }
+
+        /* ===== SIDEBAR ===== */
+.sidebar {
+    width: 280px;
+    background: #0a0a0f;
+    color: #ffffff;
+    padding: 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+/* ===== SIDEBAR BRAND ===== */
+.sidebar-brand {
+    padding: 20px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+}
+
+/* ===== LOGO ===== */
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.sidebar-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+/* ===== BRAND TEXT ===== */
+.brand-text {
+    display: block;
+}
+
+.brand-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    font-family: 'Khmer OS', 'Khmer', 'Moul', serif;
+    line-height: 1.3;
+    display: block;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 15px;
+    margin: 10px 15px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.theme-toggle .toggle-label { font-size: 12px; color: rgba(255,255,255,0.4); font-family: 'Khmer', 'Khmer OS', sans-serif; }
+.toggle-switch { width: 50px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 13px; cursor: pointer; position: relative; transition: background 0.3s; flex-shrink: 0; }
+.toggle-switch.active { background: #FFD700; }
+.toggle-switch .toggle-slider { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+/* ===== SIDEBAR MENU ===== */
+.sidebar-menu { padding: 20px 12px; }
+.sidebar-menu .menu-label { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.25); letter-spacing: 2px; padding: 10px 14px 8px; font-weight: 600; }
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    gap: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    position: relative;
+}
+.sidebar-menu a i { width: 20px; text-align: center; font-size: 16px; color: rgba(255,255,255,0.35); transition: color 0.25s ease; }
+.sidebar-menu a span { flex: 1; }
+.sidebar-menu a .badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+.sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+.sidebar-menu a:hover i { color: rgba(255,255,255,0.7); }
+.sidebar-menu a:hover .badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+.sidebar-menu a.active { background: rgba(255,255,255,0.08); color: #ffffff; }
+.sidebar-menu a.active i { color: #FFD700; }
+.sidebar-menu a.active .badge { background: rgba(255,215,0,0.15); color: #FFD700; }
+
+/* ===== SIDEBAR FOOTER ===== */
+.sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
+.sidebar-footer .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 10px;
+}
+.sidebar-footer .user-info .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a0a0f;
+    flex-shrink: 0;
+}
+.sidebar-footer .user-info .name { font-size: 14px; font-weight: 500; color: #ffffff; font-family: 'Khmer', 'Khmer OS', sans-serif; }
+.sidebar-footer .user-info .role { font-size: 11px; color: rgba(255,255,255,0.35); }
+.sidebar-footer .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+}
+.sidebar-footer .logout-btn:hover { background: rgba(255,0,0,0.08); color: rgba(255,255,255,0.7); }
+.sidebar-footer .logout-btn i { width: 20px; text-align: center; }
+.sidebar-footer .version-info { text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 1px; margin-top: 15px; font-family: 'Arial', sans-serif; }
+
+.sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; }
+.sidebar-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); width: 280px; }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-logo { width: 50px; height: 50px; }
+    .brand-title { font-size: 14px; }
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== SET PERMISSIONS ===== -->
+    {% set permissions = permissions|default(get_user_permissions()) %}
+    {% set income_count = 0 %}
+    {% set expense_count = 0 %}
+    {% set total_customers = 0 %}
+    {% set employee_count = 0 %}
+
+    <!-- ===== SIDEBAR ===== -->
+    {% include 'sidebar.html' %}
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+
+        <div class="top-header">
+            <div class="page-title">
+                <button class="hamburger" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>📤 ឯកសារចេញ</h1>
+                <p>គ្រប់គ្រងឯកសារចេញទាំងអស់</p>
+            </div>
+        </div>
+
+        <div class="sub-menu" id="subMenu">
+            {% if 'all' in permissions or 'expense_report_view' in permissions %}
+            <button class="btn-sub active" data-type="report" onclick="filterTable('report')">
+                <i class="fas fa-file-alt"></i> ការងាររបាយការណ៍
+            </button>
+            {% endif %}
+            
+            {% if 'all' in permissions or 'expense_decision_view' in permissions %}
+            <button class="btn-sub" data-type="decision" onclick="filterTable('decision')">
+                <i class="fas fa-gavel"></i> ការងារសេចក្តីសម្រេច
+            </button>
+            {% endif %}
+            
+            {% if 'all' in permissions or 'expense_warrant_view' in permissions %}
+            <button class="btn-sub" data-type="warrant" onclick="filterTable('warrant')">
+                <i class="fas fa-balance-scale"></i> ការងារចេញដីការ
+            </button>
+            {% endif %}
+            
+            {% if 'all' in permissions or 'expense_financial_view' in permissions %}
+            <button class="btn-sub" data-type="financial" onclick="filterTable('financial')">
+                <i class="fas fa-money-bill-wave"></i> ការងារហិរញ្ញវត្ថុ
+            </button>
+            {% endif %}
+            
+            {% if 'all' in permissions or 'expense_other_view' in permissions %}
+            <button class="btn-sub" data-type="other" onclick="filterTable('other')">
+                <i class="fas fa-ellipsis-h"></i> ការងារឯកសារចេញផ្សេងៗ
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="left-section">
+                    <h3 id="tableTitle">📋 បញ្ជីឯកសារចេញ - ការងាររបាយការណ៍</h3>
+                </div>
+                <div class="right-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="ស្វែងរក..." onkeyup="searchTable()">
+                        <span class="clear-search" id="clearSearch" onclick="clearSearch()">
+                            <i class="fas fa-times-circle"></i>
+                        </span>
+                    </div>
+                    <button class="btn-export" onclick="exportExcel()" title="ទាញយក Excel">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    {% if 'all' in permissions or 'expense_add' in permissions or 'expense_report_add' in permissions or 'expense_decision_add' in permissions or 'expense_warrant_add' in permissions or 'expense_financial_add' in permissions or 'expense_other_add' in permissions %}
+                    <button class="btn-add" onclick="openModal()">
+                        <i class="fas fa-plus"></i> បន្ថែមថ្មី
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>លរ</th>
+                            <th>ខ្លឹមសារលិខិត</th>
+                            <th>ប្រភពលិខិត</th>
+                            <th>ចំនួន</th>
+                            <th>ច្បាប់/សន្លឹក</th>
+                            <th>តម្លៃ/១ច្បាប់</th>
+                            <th>តម្លៃសេវាសរុប</th>
+                            <th>អង្គភាពទទួល</th>
+                            <th>ថ្ងៃខែចូល</th>
+                            <th>សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="10" class="table-empty">
+                                <i class="fas fa-inbox"></i>
+                                កំពុងផ្ទុកទិន្នន័យ...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top:15px;font-family:'Khmer','Khmer OS',sans-serif;color:var(--text-secondary);font-size:14px;text-align:right;transition:color var(--transition-speed);" id="recordCount">
+                សរុប: 0 កំណត់ត្រា
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle"><i class="fas fa-plus-circle"></i> បន្ថែមឯកសារចេញ</h2>
+            <form id="addForm" onsubmit="saveRecord(event)">
+                <input type="hidden" id="recordId" value="">
+                <input type="hidden" id="recordType" value="report">
+
+                <div class="form-group">
+                    <label>ខ្លឹមសារលិខិត</label>
+                    <textarea id="content" required placeholder="បញ្ចូលខ្លឹមសារលិខិត..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ប្រភពលិខិត</label>
+                        <input type="text" id="source" placeholder="ប្រភពលិខិត" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ចំនួន</label>
+                        <input type="number" id="quantity" placeholder="ចំនួន" required min="1" onchange="calculateTotal()" oninput="calculateTotal()">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ច្បាប់/សន្លឹក</label>
+                        <select id="unitType" required onchange="calculateTotal()">
+                            <option value="ច្បាប់">ច្បាប់</option>
+                            <option value="សន្លឹក">សន្លឹក</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>តម្លៃ/១ច្បាប់ (៛)</label>
+                        <input type="number" id="pricePerPage" placeholder="តម្លៃក្នុងមួយច្បាប់" required min="0" onchange="calculateTotal()" oninput="calculateTotal()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>តម្លៃសេវាសរុប (៛) - គណនាដោយស្វ័យប្រវត្តិ</label>
+                    <input type="number" id="totalPrice" placeholder="តម្លៃសរុប" required min="0" readonly style="background:#e8eaf6;font-weight:bold;color:#1a237e;">
+                    <div class="calculated-total" id="calculatedDisplay">0 ៛</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>អង្គភាពទទួល/អ្នកទទួល</label>
+                        <input type="text" id="recipient" placeholder="ឈ្មោះអង្គភាពទទួល" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ថ្ងៃខែចូល</label>
+                        <input type="date" id="entryDate" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fas fa-save"></i> រក្សាទុក
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        let currentType = 'report';
+        let searchKeyword = '';
+        let editingId = null;
+        let permissions = {{ permissions|tojson|safe }};
+
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            body.classList.toggle('dark-theme');
+            toggle.classList.toggle('active');
+            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggle').classList.add('active');
+            }
+            updateAddButton('report');
+            loadRecords();
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            if (!sidebar || !hamburger) return;
+            if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
+
+        function calculateTotal() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const pricePerPage = parseInt(document.getElementById('pricePerPage').value) || 0;
+            const total = quantity * pricePerPage;
+            document.getElementById('totalPrice').value = total;
+            document.getElementById('calculatedDisplay').textContent = total.toLocaleString() + ' ៛';
+        }
+
+        function updateAddButton(type) {
+            const addBtn = document.querySelector('.btn-add');
+            if (addBtn) {
+                const addPerm = 'expense_' + type + '_add';
+                const hasAddPermission = permissions.includes('all') || 
+                                         permissions.includes(addPerm) || 
+                                         permissions.includes('expense_add');
+                if (hasAddPermission) {
+                    addBtn.style.display = 'flex';
+                } else {
+                    addBtn.style.display = 'none';
+                }
+            }
+        }
+
+        function filterTable(type) {
+            currentType = type;
+            document.querySelectorAll('.btn-sub').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.type === type) btn.classList.add('active');
+            });
+            const titles = {
+                report: 'ការងាររបាយការណ៍',
+                decision: 'ការងារសេចក្តីសម្រេច',
+                warrant: 'ការងារចេញដីការ',
+                financial: 'ការងារហិរញ្ញវត្ថុ',
+                other: 'ការងារឯកសារចេញផ្សេងៗ'
+            };
+            document.getElementById('tableTitle').textContent = '📋 បញ្ជីឯកសារចេញ - ' + (titles[type] || type);
+            document.getElementById('recordType').value = type;
+
+            // ===== ពិនិត្យសិទ្ធិបន្ថែមតាមប្រភេទ =====
+            updateAddButton(type);
+
+            loadRecords();
+        }
+
+        async function loadRecords() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="10" class="table-empty"><i class="fas fa-spinner fa-spin"></i> កំពុងផ្ទុក...</td></tr>';
+            try {
+                let url = `/api/expense?type=${currentType}`;
+                if (searchKeyword) url += `&search=${encodeURIComponent(searchKeyword)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="table-empty"><i class="fas fa-inbox"></i>${searchKeyword ? 'មិនឃើញលទ្ធផលស្វែងរក' : 'មិនទាន់មានទិន្នន័យទេ'}</td></tr>`;
+                } else {
+                    let html = '';
+                    const editPerm = 'expense_' + currentType + '_edit';
+                    const deletePerm = 'expense_' + currentType + '_delete';
+                    const canEdit = permissions.includes('all') || permissions.includes(editPerm) || permissions.includes('expense_edit');
+                    const canDelete = permissions.includes('all') || permissions.includes(deletePerm) || permissions.includes('expense_delete');
+
+                    data.forEach((record, index) => {
+                        let content = record.content, source = record.source, recipient = record.recipient;
+                        if (searchKeyword) {
+                            const regex = new RegExp(searchKeyword, 'gi');
+                            content = content.replace(regex, m => `<span class="highlight-text">${m}</span>`);
+                            source = source.replace(regex, m => `<span class="highlight-text">${m}</span>`);
+                            recipient = recipient.replace(regex, m => `<span class="highlight-text">${m}</span>`);
+                        }
+
+                        html += `<tr>
+                            <td><strong>${index + 1}</strong></td>
+                            <td style="text-align:left;font-weight:500;">${content}</td>
+                            <td>${source}</td>
+                            <td>${record.quantity}</td>
+                            <td><span class="status-badge info">${record.unit_type || 'ច្បាប់'}</span></td>
+                            <td>${Number(record.price_per_page).toLocaleString()} ៛</td>
+                            <td><strong style="color:#e74c3c;">${Number(record.total_price).toLocaleString()} ៛</strong></td>
+                            <td>${recipient}</td>
+                            <td><span style="font-size:12px;color:var(--text-secondary);">${record.entry_date}</span></td>
+                            <td>
+                                ${canEdit ? `<button class="action-btn edit" onclick="editRecord(${record.id})"><i class="fas fa-edit"></i> កែ</button>` : ''}
+                                ${canDelete ? `<button class="action-btn delete" onclick="deleteRecord(${record.id})"><i class="fas fa-trash"></i> លុប</button>` : ''}
+                            </td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                }
+                document.getElementById('recordCount').textContent = `សរុប: ${data.length} កំណត់ត្រា`;
+            } catch (error) {
+                console.error('Error:', error);
+                tbody.innerHTML = '<tr><td colspan="10" class="table-empty"><i class="fas fa-exclamation-triangle"></i> មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ</td></tr>';
+            }
+        }
+
+        function searchTable() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearSearch');
+            searchKeyword = input.value.trim().toLowerCase();
+            clearBtn.style.display = searchKeyword.length > 0 ? 'inline' : 'none';
+            loadRecords();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearch').style.display = 'none';
+            searchKeyword = '';
+            loadRecords();
+        }
+
+        function exportExcel() {
+            const type = currentType;
+            const search = searchKeyword;
+            let url = `/api/expense/export?type=${type}`;
+            if (search) {
+                url += `&search=${encodeURIComponent(search)}`;
+            }
+            window.open(url, '_blank');
+        }
+
+        function openModal() {
+            document.getElementById('addForm').reset();
+            document.getElementById('recordId').value = '';
+            document.getElementById('recordType').value = currentType;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> បន្ថែមឯកសារចេញ';
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> រក្សាទុក';
+            document.getElementById('submitBtn').className = 'btn-submit';
+            document.getElementById('totalPrice').value = 0;
+            document.getElementById('calculatedDisplay').textContent = '0 ៛';
+            editingId = null;
+            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        async function editRecord(id) {
+            try {
+                const response = await fetch(`/api/expense?type=${currentType}`);
+                const data = await response.json();
+                const record = data.find(r => r.id === id);
+                if (!record) { alert('មិនឃើញទិន្នន័យនេះទេ!'); return; }
+                document.getElementById('recordId').value = record.id;
+                document.getElementById('recordType').value = record.type;
+                document.getElementById('content').value = record.content;
+                document.getElementById('source').value = record.source;
+                document.getElementById('quantity').value = record.quantity;
+                document.getElementById('unitType').value = record.unit_type || 'ច្បាប់';
+                document.getElementById('pricePerPage').value = record.price_per_page;
+                document.getElementById('totalPrice').value = record.total_price;
+                document.getElementById('calculatedDisplay').textContent = Number(record.total_price).toLocaleString() + ' ៛';
+                document.getElementById('recipient').value = record.recipient;
+                document.getElementById('entryDate').value = record.entry_date;
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> កែប្រែឯកសារចេញ';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> កែប្រែ';
+                document.getElementById('submitBtn').className = 'btn-submit update';
+                editingId = id;
+                document.getElementById('addModal').classList.add('active');
+            } catch (error) { console.error('Error:', error); alert('មានបញ្ហាក្នុងការផ្ទុកទិន្នន័យ!'); }
+        }
+
+        function closeModal() { document.getElementById('addModal').classList.remove('active'); editingId = null; }
+
+        async function saveRecord(e) {
+            e.preventDefault();
+            const data = {
+                type: document.getElementById('recordType').value,
+                content: document.getElementById('content').value.trim(),
+                source: document.getElementById('source').value.trim(),
+                quantity: parseInt(document.getElementById('quantity').value),
+                unit_type: document.getElementById('unitType').value,
+                price_per_page: parseFloat(document.getElementById('pricePerPage').value),
+                total_price: parseFloat(document.getElementById('totalPrice').value),
+                recipient: document.getElementById('recipient').value.trim(),
+                entry_date: document.getElementById('entryDate').value
+            };
+            if (!data.content || !data.source || !data.recipient) { alert('សូមបំពេញព័ត៌មានឱ្យបានពេញលេញ!'); return; }
+            try {
+                const id = document.getElementById('recordId').value;
+                const url = id ? `/api/expense/${id}` : '/api/expense';
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await response.json();
+                if (result.success) {
+                    closeModal();
+                    loadRecords();
+                    alert(id ? '✅ បានកែប្រែឯកសារដោយជោគជ័យ!' : '✅ បានបន្ថែមឯកសារដោយជោគជ័យ!');
+                } else { alert(result.error || 'មានបញ្ហាក្នុងការរក្សាទុក!'); }
+            } catch (error) { console.error('Error:', error); alert('មានបញ្ហាក្នុងការរក្សាទុក!'); }
+        }
+
+        async function deleteRecord(id) {
+            if (!confirm('តើអ្នកពិតជាចង់លុបឯកសារនេះមែនទេ?')) return;
+            try {
+                const response = await fetch(`/api/expense/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) { loadRecords(); alert('✅ បានលុបឯកសារដោយជោគជ័យ!'); } else { alert(result.error || 'មានបញ្ហាក្នុងការលុប!'); }
+            } catch (error) { console.error('Error:', error); alert('មានបញ្ហាក្នុងការលុប!'); }
+        }
+
+        document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); document.getElementById('searchInput').focus(); }
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+
+</body>
+</html>

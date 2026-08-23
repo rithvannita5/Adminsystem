@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <!-- ===== PWA MANIFEST ===== -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFD700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ===== FAVICON ===== -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a2e'/%3E%3Ctext x='50' y='72' font-size='60' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+<link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a2e'/%3E%3Ctext x='50' y='72' font-size='60' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ថវិកាចេញ - ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Khmer&display=swap');
+
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #ecf0f1;
+            --shadow-color: rgba(0,0,0,0.08);
+            --card-bg: #ffffff;
+            --header-bg: #ffffff;
+            --input-bg: #f0f2f5;
+            --input-border: #ecf0f1;
+            --transition-speed: 0.5s;
+        }
+
+        body.dark-theme {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #2a2a4a;
+            --shadow-color: rgba(0,0,0,0.3);
+            --card-bg: #1e1e3a;
+            --header-bg: #1a1a3a;
+            --input-bg: #2a2a4a;
+            --input-border: #3a3a5a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Khmer', 'Khmer OS', 'Moul', 'Arial', sans-serif;
+            background: var(--bg-primary);
+            display: flex;
+            min-height: 100vh;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #0a0a0f;
+            color: #ffffff;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        .sidebar-brand {
+            padding: 25px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon { font-size: 32px; color: #FFD700; }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-title { font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 1px; font-family: 'Arial', sans-serif; }
+        .brand-sub { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 15px;
+            margin: 10px 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .theme-toggle .toggle-label { font-size: 12px; color: rgba(255,255,255,0.4); font-family: 'Khmer', 'Khmer OS', sans-serif; }
+        .toggle-switch { width: 50px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 13px; cursor: pointer; position: relative; transition: background 0.3s; flex-shrink: 0; }
+        .toggle-switch.active { background: #FFD700; }
+        .toggle-switch .toggle-slider { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+        .sidebar-menu { padding: 20px 12px; }
+        .sidebar-menu .menu-label { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.25); letter-spacing: 2px; padding: 10px 14px 8px; font-weight: 600; }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 11px 16px;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            gap: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            position: relative;
+        }
+        .sidebar-menu a i { width: 20px; text-align: center; font-size: 16px; color: rgba(255,255,255,0.35); transition: color 0.25s ease; }
+        .sidebar-menu a span { flex: 1; }
+        .sidebar-menu a .badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.5);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+        .sidebar-menu a:hover i { color: rgba(255,255,255,0.7); }
+        .sidebar-menu a:hover .badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+        .sidebar-menu a.active { background: rgba(255,255,255,0.08); color: #ffffff; }
+        .sidebar-menu a.active i { color: #FFD700; }
+        .sidebar-menu a.active .badge { background: rgba(255,215,0,0.15); color: #FFD700; }
+
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom: 10px;
+        }
+        .sidebar-footer .user-info .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a0a0f;
+            flex-shrink: 0;
+        }
+        .sidebar-footer .user-info .name { font-size: 14px; font-weight: 500; color: #ffffff; font-family: 'Khmer', 'Khmer OS', sans-serif; }
+        .sidebar-footer .user-info .role { font-size: 11px; color: rgba(255,255,255,0.35); }
+        .sidebar-footer .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+        .sidebar-footer .logout-btn:hover { background: rgba(255,0,0,0.08); color: rgba(255,255,255,0.7); }
+        .sidebar-footer .logout-btn i { width: 20px; text-align: center; }
+        .sidebar-footer .version-info { text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 1px; margin-top: 15px; font-family: 'Arial', sans-serif; }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            min-height: 100vh;
+            transition: background var(--transition-speed);
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .top-header .page-title h1 { font-size: 24px; color: var(--text-primary); font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+        .top-header .page-title p { color: var(--text-secondary); font-size: 14px; font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px var(--shadow-color);
+            transition: transform 0.3s, background var(--transition-speed), box-shadow var(--transition-speed);
+            border-left: 4px solid #1a237e;
+            text-align: center;
+        }
+
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .stat-card .stat-icon { font-size: 30px; margin-bottom: 10px; display: block; }
+        .stat-card .stat-value { font-size: 22px; font-weight: bold; color: var(--text-primary); font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+        .stat-card .stat-label { font-size: 14px; color: var(--text-secondary); font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+        .stat-card .stat-count { font-size: 12px; color: var(--text-secondary); margin-top: 5px; }
+
+        .stat-card.report { border-left-color: #FF6B6B; }
+        .stat-card.report .stat-icon { color: #FF6B6B; }
+        .stat-card.decision { border-left-color: #FF9F43; }
+        .stat-card.decision .stat-icon { color: #FF9F43; }
+        .stat-card.warrant { border-left-color: #FECA57; }
+        .stat-card.warrant .stat-icon { color: #FECA57; }
+        .stat-card.financial { border-left-color: #48DBFB; }
+        .stat-card.financial .stat-icon { color: #48DBFB; }
+        .stat-card.other { border-left-color: #A29BFE; }
+        .stat-card.other .stat-icon { color: #A29BFE; }
+        .stat-card.total { border-left-color: #1a237e; }
+        .stat-card.total .stat-icon { color: #1a237e; }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 15px var(--shadow-color);
+            transition: background var(--transition-speed), box-shadow var(--transition-speed);
+            margin-bottom: 30px;
+        }
+
+        .chart-container h3 {
+            color: var(--text-primary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: color var(--transition-speed);
+        }
+
+        .chart-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            height: 350px;
+        }
+
+        .detail-container {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 15px var(--shadow-color);
+            transition: background var(--transition-speed), box-shadow var(--transition-speed);
+            overflow-x: auto;
+        }
+
+        .detail-container h3 {
+            color: var(--text-primary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 14px;
+        }
+
+        table thead {
+            background: #1a237e;
+            color: white;
+        }
+
+        table thead th {
+            padding: 12px 10px;
+            text-align: center;
+            white-space: nowrap;
+            font-weight: normal;
+        }
+
+        table tbody td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        table tbody tr:hover {
+            background: rgba(26, 35, 126, 0.05);
+        }
+
+        body.dark-theme table tbody tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        body.dark-theme table thead {
+            background: #0d0d2b;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background: rgba(26, 35, 126, 0.1);
+        }
+
+        body.dark-theme .total-row {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .color-indicator {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .hamburger { display: block; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            table { font-size: 12px; }
+            table thead th, table tbody td { padding: 6px 5px; }
+            .chart-wrapper { height: 220px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 15px; }
+            .stat-card .stat-value { font-size: 18px; }
+            .stat-card .stat-label { font-size: 12px; }
+            .chart-wrapper { height: 180px; }
+        }
+
+        /* ===== SIDEBAR ===== */
+.sidebar {
+    width: 280px;
+    background: #0a0a0f;
+    color: #ffffff;
+    padding: 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+/* ===== SIDEBAR BRAND ===== */
+.sidebar-brand {
+    padding: 20px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+}
+
+/* ===== LOGO ===== */
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.sidebar-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+/* ===== BRAND TEXT ===== */
+.brand-text {
+    display: block;
+}
+
+.brand-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    font-family: 'Khmer OS', 'Khmer', 'Moul', serif;
+    line-height: 1.3;
+    display: block;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 15px;
+    margin: 10px 15px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.theme-toggle .toggle-label { font-size: 12px; color: rgba(255,255,255,0.4); font-family: 'Khmer', 'Khmer OS', sans-serif; }
+.toggle-switch { width: 50px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 13px; cursor: pointer; position: relative; transition: background 0.3s; flex-shrink: 0; }
+.toggle-switch.active { background: #FFD700; }
+.toggle-switch .toggle-slider { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+/* ===== SIDEBAR MENU ===== */
+.sidebar-menu { padding: 20px 12px; }
+.sidebar-menu .menu-label { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.25); letter-spacing: 2px; padding: 10px 14px 8px; font-weight: 600; }
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    gap: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+    position: relative;
+}
+.sidebar-menu a i { width: 20px; text-align: center; font-size: 16px; color: rgba(255,255,255,0.35); transition: color 0.25s ease; }
+.sidebar-menu a span { flex: 1; }
+.sidebar-menu a .badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+.sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+.sidebar-menu a:hover i { color: rgba(255,255,255,0.7); }
+.sidebar-menu a:hover .badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+.sidebar-menu a.active { background: rgba(255,255,255,0.08); color: #ffffff; }
+.sidebar-menu a.active i { color: #FFD700; }
+.sidebar-menu a.active .badge { background: rgba(255,215,0,0.15); color: #FFD700; }
+
+/* ===== SIDEBAR FOOTER ===== */
+.sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
+.sidebar-footer .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 10px;
+}
+.sidebar-footer .user-info .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a0a0f;
+    flex-shrink: 0;
+}
+.sidebar-footer .user-info .name { font-size: 14px; font-weight: 500; color: #ffffff; font-family: 'Khmer', 'Khmer OS', sans-serif; }
+.sidebar-footer .user-info .role { font-size: 11px; color: rgba(255,255,255,0.35); }
+.sidebar-footer .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    font-family: 'Khmer', 'Khmer OS', sans-serif;
+}
+.sidebar-footer .logout-btn:hover { background: rgba(255,0,0,0.08); color: rgba(255,255,255,0.7); }
+.sidebar-footer .logout-btn i { width: 20px; text-align: center; }
+.sidebar-footer .version-info { text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 1px; margin-top: 15px; font-family: 'Arial', sans-serif; }
+
+.sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; }
+.sidebar-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); width: 280px; }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-logo { width: 50px; height: 50px; }
+    .brand-title { font-size: 14px; }
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- ===== SET PERMISSIONS ===== -->
+    {% set permissions = permissions|default(get_user_permissions()) %}
+    {% set income_count = 0 %}
+    {% set expense_count = 0 %}
+    {% set total_customers = 0 %}
+    {% set employee_count = 0 %}
+
+    <!-- ===== SIDEBAR ===== -->
+    {% include 'sidebar.html' %}
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+
+        <div class="top-header">
+            <div class="page-title">
+                <button class="hamburger" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>💸 ថវិកាចេញ</h1>
+                <p>សង្ខេបថវិកាចេញតាមប្រភេទ</p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            {% set types = ['report', 'decision', 'warrant', 'financial', 'other'] %}
+            {% set labels = {'report': 'របាយការណ៍', 'decision': 'សេចក្តីសម្រេច', 'warrant': 'ដីការ', 'financial': 'ហិរញ្ញវត្ថុ', 'other': 'ផ្សេងៗ'} %}
+            {% set icons = {'report': '📄', 'decision': '⚖️', 'warrant': '📜', 'financial': '💰', 'other': '📌'} %}
+            {% set css_classes = {'report': 'report', 'decision': 'decision', 'warrant': 'warrant', 'financial': 'financial', 'other': 'other'} %}
+
+            {% for t in types %}
+            <div class="stat-card {{ css_classes[t] }}">
+                <span class="stat-icon">{{ icons[t] }}</span>
+                <div class="stat-value">{{ "{:,.0f}".format(expense_data.get(t, 0)) }} ៛</div>
+                <div class="stat-label">{{ labels[t] }}</div>
+                <div class="stat-count">ចំនួន: {{ people_count.get(t, 0) }} នាក់</div>
+            </div>
+            {% endfor %}
+
+            <div class="stat-card total">
+                <span class="stat-icon">💸</span>
+                <div class="stat-value">{{ "{:,.0f}".format(total_expense) }} ៛</div>
+                <div class="stat-label">សរុបរួម</div>
+                <div class="stat-count">ចំនួន: {{ total_people }} នាក់</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>📊 សមាមាត្រចំណាយតាមប្រភេទ</h3>
+            <div class="chart-wrapper">
+                <canvas id="expenseBudgetChart"></canvas>
+            </div>
+        </div>
+
+        <div class="detail-container">
+            <h3>📋 ពត៌មានលម្អិត</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>លរ</th>
+                        <th>ប្រភេទការងារ</th>
+                        <th>ចំនួននាក់</th>
+                        <th>ថវិកាសរុប</th>
+                        <th>ភាគរយ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set colors = {'report': '#FF6B6B', 'decision': '#FF9F43', 'warrant': '#FECA57', 'financial': '#48DBFB', 'other': '#A29BFE'} %}
+                    {% for t in types %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <span class="color-indicator" style="background:{{ colors[t] }};"></span>
+                            {{ icons[t] }} {{ labels[t] }}
+                        </td>
+                        <td>{{ people_count.get(t, 0) }} នាក់</td>
+                        <td>{{ "{:,.0f}".format(expense_data.get(t, 0)) }} ៛</td>
+                        <td>
+                            {% if total_expense > 0 %}
+                                {{ "%.1f"|format((expense_data.get(t, 0) / total_expense * 100)) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align:right;font-weight:bold;">សរុបរួម</td>
+                        <td>{{ total_people }} នាក់</td>
+                        <td>{{ "{:,.0f}".format(total_expense) }} ៛</td>
+                        <td>100%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            body.classList.toggle('dark-theme');
+            toggle.classList.toggle('active');
+            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggle').classList.add('active');
+            }
+            initChart();
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            if (!sidebar || !hamburger) return;
+            if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('expenseBudgetChart').getContext('2d');
+            const chartData = {
+                labels: {{ chart_labels|tojson|safe }},
+                values: {{ chart_values|tojson|safe }},
+                colors: {{ chart_colors|tojson|safe }}
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'ចំណាយ (៛)',
+                        data: chartData.values,
+                        backgroundColor: chartData.colors.map(c => c + 'CC'),
+                        borderColor: chartData.colors,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barPercentage: 0.6,
+                        hoverBackgroundColor: chartData.colors,
+                        hoverBorderColor: chartData.colors,
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.parsed.y;
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return 'ចំណាយ: ' + value.toLocaleString() + ' ៛ (' + percentage + '%)';
+                                }
+                            },
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: { size: 14, family: 'Khmer, Khmer OS, sans-serif' },
+                            bodyFont: { size: 13, family: 'Khmer, Khmer OS, sans-serif' },
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) { return value.toLocaleString() + ' ៛'; },
+                                font: { size: 11, family: 'Khmer, Khmer OS, sans-serif' }
+                            },
+                            grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 13, family: 'Khmer, Khmer OS, sans-serif', weight: 'bold' } }
+                        }
+                    },
+                    animation: { duration: 1200, easing: 'easeInOutQuart' },
+                    layout: { padding: { top: 20, bottom: 10 } }
+                }
+            });
+        }
+    </script>
+<script>
+// ===== ចុះឈ្មោះ Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+            console.log('✅ Service Worker registered successfully!');
+
+            // ===== ពិនិត្យ Update =====
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('🔄 New Service Worker available!');
+                        // Reload page to use new version
+                        // window.location.reload();
+                    }
+                });
+            });
+        })
+        .catch(err => {
+            console.log('❌ Service Worker registration failed:', err);
+        });
+}
+
+// ===== ទទួលសារពី Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.type === 'ONLINE') {
+            console.log('📡', event.data.message);
+            // Show notification to user
+            // alert(event.data.message);
+        }
+    });
+}
+</script>
+</body>
+</html>
