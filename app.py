@@ -2410,69 +2410,39 @@ def manifest():
 
 
 # ============================================
-# SERVICE WORKER
+# ROUTE: Service Worker (គាំទ្រទាំង /sw.js និង /service-worker.js)
 # ============================================
+@app.route('/sw.js')
 @app.route('/service-worker.js')
-def service_worker():
-    js = '''// Service Worker - Offline Support
+def serve_sw():
+    js = '''// Service Worker - PWA Support
 const CACHE_NAME = 'admin-system-v1';
 const STATIC_FILES = [
     '/',
     '/dashboard',
-    '/income',
-    '/expense',
-    '/income-budget',
-    '/expense-budget',
-    '/total-budget',
-    '/customers',
-    '/info',
-    '/employees',
-    '/settings',
-    '/offline'
+    '/login',
+    '/manifest.json'
 ];
 
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(STATIC_FILES))
-            .then(() => self.skipWaiting())
+        caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_FILES)).then(() => self.skipWaiting())
     );
 });
 
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(name => {
-                    if (name !== CACHE_NAME) {
-                        return caches.delete(name);
-                    }
-                })
-            );
-        }).then(() => self.clients.claim())
-    );
+    event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
     event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, clone);
-                });
-                return response;
-            })
-            .catch(() => {
-                return caches.match(event.request);
-            })
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });
-
-console.log('Service Worker loaded successfully!');'''
+'''
     return js, 200, {
         'Content-Type': 'application/javascript',
-        'Cache-Control': 'public, max-age=86400'
+        'Cache-Control': 'no-cache'
     }
 
 
