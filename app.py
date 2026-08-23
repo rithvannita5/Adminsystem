@@ -2377,17 +2377,17 @@ def favicon():
 
 
 # ============================================
-# MANIFEST.JSON (ប្រើ Logo ផ្ទាល់ខ្លួន)
+# MANIFEST.JSON
 # ============================================
 @app.route('/manifest.json')
 def manifest():
     manifest_data = {
         "name": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល",
         "short_name": "គ្រប់គ្រងរដ្ឋបាល",
-        "description": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល - រដ្ឋបាលស្រុកដងទង់",
+        "description": "ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល - រដ្ឋបាលសង្កាត់ដងទង់",
         "start_url": "/dashboard",
         "display": "standalone",
-        "background_color": "#0d1117",
+        "background_color": "#0a0a0f",
         "theme_color": "#FFD700",
         "orientation": "portrait",
         "scope": "/",
