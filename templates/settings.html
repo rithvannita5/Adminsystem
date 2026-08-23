@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <!-- ===== PWA MANIFEST ===== -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FFD700">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ===== FAVICON ===== -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a2e'/%3E%3Ctext x='50' y='72' font-size='60' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+<link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231a1a2e'/%3E%3Ctext x='50' y='72' font-size='60' text-anchor='middle' font-family='Arial' fill='%23FFD700'%3E📊%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ការកំណត់ - TC GAMING</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Khmer&display=swap');
+
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #ecf0f1;
+            --shadow-color: rgba(0,0,0,0.08);
+            --card-bg: #ffffff;
+            --header-bg: #ffffff;
+            --input-bg: #f0f2f5;
+            --input-border: #ecf0f1;
+            --transition-speed: 0.5s;
+        }
+
+        body.dark-theme {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #2a2a4a;
+            --shadow-color: rgba(0,0,0,0.3);
+            --card-bg: #1e1e3a;
+            --header-bg: #1a1a3a;
+            --input-bg: #2a2a4a;
+            --input-border: #3a3a5a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Khmer', 'Khmer OS', 'Moul', 'Arial', sans-serif;
+            background: var(--bg-primary);
+            display: flex;
+            min-height: 100vh;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: #0a0a0f;
+            color: #ffffff;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+        .sidebar-brand {
+            padding: 25px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .brand-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            font-family: 'Khmer OS', 'Khmer', 'Moul', serif;
+            line-height: 1.3;
+            display: block;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 15px;
+            margin: 10px 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .theme-toggle .toggle-label { font-size: 12px; color: rgba(255,255,255,0.4); font-family: 'Khmer', 'Khmer OS', sans-serif; }
+        .toggle-switch { width: 50px; height: 26px; background: rgba(255,255,255,0.1); border-radius: 13px; cursor: pointer; position: relative; transition: background 0.3s; flex-shrink: 0; }
+        .toggle-switch.active { background: #FFD700; }
+        .toggle-switch .toggle-slider { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .toggle-switch.active .toggle-slider { transform: translateX(24px); }
+
+        .sidebar-menu { padding: 20px 12px; }
+        .sidebar-menu .menu-label { font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.25); letter-spacing: 2px; padding: 10px 14px 8px; font-weight: 600; }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 11px 16px;
+            color: rgba(255,255,255,0.55);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            gap: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            position: relative;
+        }
+        .sidebar-menu a i { width: 20px; text-align: center; font-size: 16px; color: rgba(255,255,255,0.35); transition: color 0.25s ease; }
+        .sidebar-menu a span { flex: 1; }
+        .sidebar-menu a .badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.5);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+        .sidebar-menu a:hover i { color: rgba(255,255,255,0.7); }
+        .sidebar-menu a:hover .badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+        .sidebar-menu a.active { background: rgba(255,255,255,0.08); color: #ffffff; }
+        .sidebar-menu a.active i { color: #FFD700; }
+        .sidebar-menu a.active .badge { background: rgba(255,215,0,0.15); color: #FFD700; }
+
+        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom: 10px;
+        }
+        .sidebar-footer .user-info .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0a0a0f;
+            flex-shrink: 0;
+        }
+        .sidebar-footer .user-info .name { font-size: 14px; font-weight: 500; color: #ffffff; font-family: 'Khmer', 'Khmer OS', sans-serif; }
+        .sidebar-footer .user-info .role { font-size: 11px; color: rgba(255,255,255,0.35); }
+        .sidebar-footer .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+        .sidebar-footer .logout-btn:hover { background: rgba(255,0,0,0.08); color: rgba(255,255,255,0.7); }
+        .sidebar-footer .logout-btn i { width: 20px; text-align: center; }
+        .sidebar-footer .version-info { text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 1px; margin-top: 15px; font-family: 'Arial', sans-serif; }
+
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-logo { width: 60px; height: 60px; }
+            .brand-title { font-size: 14px; }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            min-height: 100vh;
+            transition: background var(--transition-speed);
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .top-header .page-title h1 { font-size: 24px; color: var(--text-primary); font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+        .top-header .page-title p { color: var(--text-secondary); font-size: 14px; font-family: 'Khmer', 'Khmer OS', sans-serif; transition: color var(--transition-speed); }
+
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 15px var(--shadow-color);
+            transition: background var(--transition-speed), box-shadow var(--transition-speed);
+            margin-bottom: 25px;
+        }
+
+        .settings-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .settings-card .card-header h3 {
+            color: var(--text-primary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 20px;
+            transition: color var(--transition-speed);
+        }
+
+        .settings-card .card-header h3 i {
+            margin-right: 8px;
+            color: #1a237e;
+        }
+
+        body.dark-theme .settings-card .card-header h3 i {
+            color: #FFD700;
+        }
+
+        .btn-primary {
+            padding: 10px 25px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover { background: #0d1442; transform: scale(1.02); }
+        body.dark-theme .btn-primary { background: #FFD700; color: #1a237e; }
+        body.dark-theme .btn-primary:hover { background: #f0c000; }
+
+        .btn-danger {
+            padding: 8px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-danger:hover { background: #c0392b; transform: scale(1.02); }
+
+        .btn-warning {
+            padding: 8px 20px;
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-warning:hover { background: #e67e22; transform: scale(1.02); }
+
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+        .table-container { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 14px;
+        }
+
+        table thead {
+            background: #1a237e;
+            color: white;
+        }
+
+        table thead th {
+            padding: 12px 15px;
+            text-align: center;
+            white-space: nowrap;
+            font-weight: normal;
+        }
+
+        body.dark-theme table thead { background: #0d0d2b; }
+
+        table tbody td {
+            padding: 10px 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        table tbody tr:hover { background: rgba(26, 35, 126, 0.05); }
+        body.dark-theme table tbody tr:hover { background: rgba(255, 215, 0, 0.05); }
+
+        .status-badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-badge.active { background: #27ae60; color: white; }
+        .status-badge.inactive { background: #e74c3c; color: white; }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box input {
+            padding: 8px 15px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 200px;
+            transition: border-color 0.3s, background var(--transition-speed), color var(--transition-speed);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideUp 0.5s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+        .toast.info { background: #2980b9; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            max-width: 950px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideDown 0.3s ease;
+            transition: background var(--transition-speed);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+            background: none;
+            border: none;
+        }
+
+        .modal-content .modal-close:hover { color: #e74c3c; }
+        .modal-content h2 {
+            color: var(--text-primary);
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            color: var(--text-primary);
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: color var(--transition-speed);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            transition: border-color 0.3s, background var(--transition-speed), color var(--transition-speed);
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background: #0d1442; }
+        .btn-submit.update { background: #f39c12; }
+        .btn-submit.update:hover { background: #e67e22; }
+        body.dark-theme .btn-submit { background: #FFD700; color: #1a237e; }
+        body.dark-theme .btn-submit:hover { background: #f0c000; }
+
+        /* ===== PERMISSION TREE ===== */
+        .permission-group {
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 15px 18px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border-color);
+            transition: background var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .permission-group-title {
+            font-weight: bold;
+            color: var(--text-primary);
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .permission-group-title input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1a237e;
+            flex-shrink: 0;
+        }
+
+        .permission-children {
+            padding-left: 30px;
+            border-left: 3px solid var(--border-color);
+            transition: border-color var(--transition-speed);
+        }
+
+        .permission-sub-group {
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--border-color);
+            transition: background var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .permission-sub-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            transition: color var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .permission-sub-title input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1a237e;
+            flex-shrink: 0;
+        }
+
+        .permission-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-left: 25px;
+        }
+
+        .permission-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: var(--input-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: background var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .permission-item:hover {
+            background: rgba(26, 35, 126, 0.05);
+        }
+
+        .permission-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1a237e;
+            flex-shrink: 0;
+        }
+
+        .permission-item label {
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: color var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        .permission-action-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            padding-left: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn-select-all, .btn-deselect-all {
+            padding: 4px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-select-all { background: #27ae60; color: white; }
+        .btn-select-all:hover { background: #219a52; transform: scale(1.02); }
+        .btn-deselect-all { background: #e74c3c; color: white; }
+        .btn-deselect-all:hover { background: #c0392b; transform: scale(1.02); }
+        body.dark-theme .btn-select-all { background: #2ecc71; }
+        body.dark-theme .btn-deselect-all { background: #e74c3c; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 15px; }
+            .hamburger { display: block; }
+            .settings-card { padding: 15px; }
+            .form-row { grid-template-columns: 1fr; }
+            .permission-children { padding-left: 15px; }
+            .permission-row { flex-direction: column; gap: 4px; }
+            .permission-item { width: 100%; }
+            .permission-action-row { flex-direction: column; }
+            .btn-select-all, .btn-deselect-all { width: 100%; text-align: center; }
+            .modal-content { padding: 20px; max-width: 100%; }
+            .search-box input { min-width: 100%; }
+            table { font-size: 12px; }
+            table thead th, table tbody td { padding: 6px 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .settings-card .card-header { flex-direction: column; align-items: stretch; }
+            .settings-card .card-header .btn-primary { justify-content: center; }
+            .permission-children { padding-left: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SET PERMISSIONS ===== -->
+    {% set permissions = permissions|default(get_user_permissions()) %}
+    {% set income_count = 0 %}
+    {% set expense_count = 0 %}
+    {% set total_customers = 0 %}
+    {% set employee_count = 0 %}
+
+    <!-- ===== SIDEBAR ===== -->
+    {% include 'sidebar.html' %}
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+
+        <div class="top-header">
+            <div class="page-title">
+                <button class="hamburger" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>⚙️ ការកំណត់</h1>
+                <p>គ្រប់គ្រងប្រព័ន្ធ អ្នកប្រើប្រាស់ សិទ្ធ និងសវនកម្ម</p>
+            </div>
+        </div>
+
+        <!-- ===== 1. គ្រប់គ្រងអ្នកប្រើប្រាស់ ===== -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fas fa-users" style="color:#1a237e;"></i> 1. គ្រប់គ្រងអ្នកប្រើប្រាស់</h3>
+                <button class="btn-primary" onclick="openUserModal()">
+                    <i class="fas fa-plus"></i> បន្ថែមថ្មី
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+    <thead>
+        <tr>
+            <th>លរ</th>
+            <th>ឈ្មោះអ្នកប្រើ</th>
+            <th>ឈ្មោះពេញ</th>
+            <th>លេខទូរស័ព្ទ</th>  <!-- ← ប្តូរពី Email -->
+            <th>តួនាទី</th>
+            <th>ស្ថានភាព</th>
+            <th>សកម្មភាព</th>
+        </tr>
+    </thead>
+    <tbody id="usersTableBody">
+        <tr><td colspan="7" class="empty-message">កំពុងផ្ទុក...</td></tr>
+    </tbody>
+</table>
+            </div>
+        </div>
+
+        <!-- ===== 2. សិទ្ធ និងតួនាទី ===== -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-tag" style="color:#1a237e;"></i> 2. សិទ្ធ និងតួនាទី</h3>
+                <button class="btn-primary" onclick="openRoleModal()">
+                    <i class="fas fa-plus"></i> បង្កើតតួនាទី
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>លរ</th>
+                            <th>ឈ្មោះតួនាទី</th>
+                            <th>ការពណ៌នា</th>
+                            <th>សិទ្ធិ</th>
+                            <th>សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTableBody">
+                        <tr><td colspan="5" class="empty-message">កំពុងផ្ទុក...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== 3. សវនកម្ម ===== -->
+        <div class="settings-card">
+            <div class="card-header">
+                <h3><i class="fas fa-history" style="color:#1a237e;"></i> 3. សវនកម្ម</h3>
+            </div>
+            <div class="search-box" style="margin-bottom:15px;">
+                <input type="text" id="auditSearch" placeholder="ស្វែងរកតាមឈ្មោះ សកម្មភាព ម៉ូឌុល..." onkeyup="searchAudit()">
+                <button class="btn-primary" onclick="searchAudit()"><i class="fas fa-search"></i> ស្វែងរក</button>
+                <button class="btn-warning" onclick="refreshAudit()"><i class="fas fa-sync"></i> ធ្វើឱ្យថ្មី</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>លរ</th>
+                            <th>អ្នកប្រើប្រាស់</th>
+                            <th>សកម្មភាព</th>
+                            <th>ម៉ូឌុល</th>
+                            <th>ពត៌មានលម្អិត</th>
+                            <th>ពេលវេលា</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr><td colspan="6" class="empty-message">កំពុងផ្ទុក...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== MODAL: USER ===== -->
+<div class="modal" id="userModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('userModal')">&times;</button>
+        <h2 id="userModalTitle"><i class="fas fa-user-plus"></i> បន្ថែមអ្នកប្រើប្រាស់</h2>
+        <form id="userForm" onsubmit="saveUser(event)">
+            <input type="hidden" id="userId" value="">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ឈ្មោះអ្នកប្រើប្រាស់</label>
+                    <input type="text" id="userUsername" required placeholder="បញ្ចូលឈ្មោះ">
+                </div>
+                <div class="form-group">
+                    <label>ឈ្មោះពេញ</label>
+                    <input type="text" id="userFullName" placeholder="បញ្ចូលឈ្មោះពេញ">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>លេខទូរស័ព្ទ <span style="color:#FF6B6B;">*</span></label>
+                    <input type="tel" id="userPhone" required placeholder="បញ្ចូលលេខទូរស័ព្ទ (ឧ: 012345678)">
+                </div>
+                <div class="form-group">
+                    <label>ពាក្យសម្ងាត់</label>
+                    <input type="password" id="userPassword" placeholder="បញ្ចូលពាក្យសម្ងាត់">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>តួនាទី</label>
+                    <select id="userRole" required></select>
+                </div>
+                <div class="form-group">
+                    <label>ស្ថានភាព</label>
+                    <select id="userStatus">
+                        <option value="1">សកម្ម</option>
+                        <option value="0">អសកម្ម</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;padding:12px;justify-content:center;">
+                <i class="fas fa-save"></i> រក្សាទុក
+            </button>
+        </form>
+    </div>
+</div>
+
+    <!-- ===== MODAL: ROLE (TREE STRUCTURE) ===== -->
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('roleModal')">&times;</button>
+            <h2 id="roleModalTitle"><i class="fas fa-plus-circle"></i> បង្កើតតួនាទី</h2>
+            <form id="roleForm" onsubmit="saveRole(event)">
+                <input type="hidden" id="roleId" value="">
+                <div class="form-group">
+                    <label>ឈ្មោះតួនាទី</label>
+                    <input type="text" id="roleName" required placeholder="ឧទាហរណ៍: Manager">
+                </div>
+                <div class="form-group">
+                    <label>ការពណ៌នា</label>
+                    <textarea id="roleDescription" placeholder="ការពណ៌នាអំពីតួនាទីនេះ"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>សិទ្ធិចូលប្រើប្រាស់</label>
+
+                    <!-- ===== DASHBOARD ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="dashboard" onchange="toggleGroupCheckbox('dashboard')">
+                            <i class="fas fa-th-large"></i> Dashboard
+                        </div>
+                        <div class="permission-children" id="children_dashboard">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_dashboard" value="dashboard">
+                                <label for="perm_dashboard">👁️ មើល Dashboard</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== ឯកសារចូល ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="income" onchange="toggleGroupCheckbox('income')">
+                            <i class="fas fa-file-import"></i> ឯកសារចូល
+                        </div>
+                        <div class="permission-children" id="children_income">
+                            <!-- ការងារធនាគារ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="income_bank" onchange="toggleSubGroupCheckbox('income_bank')">
+                                    🏦 ការងារធនាគារ
+                                </div>
+                                <div class="permission-row" id="children_income_bank">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_bank_view" value="income_bank_view">
+                                        <label for="perm_income_bank_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_bank_add" value="income_bank_add">
+                                        <label for="perm_income_bank_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_bank_edit" value="income_bank_edit">
+                                        <label for="perm_income_bank_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_bank_delete" value="income_bank_delete">
+                                        <label for="perm_income_bank_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('income_bank', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('income_bank', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- ការងារដីធ្លី -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="income_land" onchange="toggleSubGroupCheckbox('income_land')">
+                                    🗺️ ការងារដីធ្លី
+                                </div>
+                                <div class="permission-row" id="children_income_land">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_land_view" value="income_land_view">
+                                        <label for="perm_income_land_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_land_add" value="income_land_add">
+                                        <label for="perm_income_land_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_land_edit" value="income_land_edit">
+                                        <label for="perm_income_land_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_land_delete" value="income_land_delete">
+                                        <label for="perm_income_land_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('income_land', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('income_land', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- ការងារផ្ទះ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="income_home" onchange="toggleSubGroupCheckbox('income_home')">
+                                    🏠 ការងារផ្ទះ
+                                </div>
+                                <div class="permission-row" id="children_income_home">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_home_view" value="income_home_view">
+                                        <label for="perm_income_home_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_home_add" value="income_home_add">
+                                        <label for="perm_income_home_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_home_edit" value="income_home_edit">
+                                        <label for="perm_income_home_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_home_delete" value="income_home_delete">
+                                        <label for="perm_income_home_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('income_home', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('income_home', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- ការងារអាពាហ៍ពិពាហ៍ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="income_wedding" onchange="toggleSubGroupCheckbox('income_wedding')">
+                                    💍 ការងារអាពាហ៍ពិពាហ៍
+                                </div>
+                                <div class="permission-row" id="children_income_wedding">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_wedding_view" value="income_wedding_view">
+                                        <label for="perm_income_wedding_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_wedding_add" value="income_wedding_add">
+                                        <label for="perm_income_wedding_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_wedding_edit" value="income_wedding_edit">
+                                        <label for="perm_income_wedding_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_wedding_delete" value="income_wedding_delete">
+                                        <label for="perm_income_wedding_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('income_wedding', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('income_wedding', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- ការងារផ្សេងៗ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="income_other" onchange="toggleSubGroupCheckbox('income_other')">
+                                    📌 ការងារផ្សេងៗ
+                                </div>
+                                <div class="permission-row" id="children_income_other">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_other_view" value="income_other_view">
+                                        <label for="perm_income_other_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_other_add" value="income_other_add">
+                                        <label for="perm_income_other_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_other_edit" value="income_other_edit">
+                                        <label for="perm_income_other_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_income_other_delete" value="income_other_delete">
+                                        <label for="perm_income_other_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('income_other', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('income_other', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <div class="permission-action-row">
+                                <button type="button" class="btn-select-all" onclick="toggleGroup('income', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                <button type="button" class="btn-deselect-all" onclick="toggleGroup('income', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== ឯកសារចេញ ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="expense" onchange="toggleGroupCheckbox('expense')">
+                            <i class="fas fa-file-export"></i> ឯកសារចេញ
+                        </div>
+                        <div class="permission-children" id="children_expense">
+                            <!-- 1. ការងាររបាយការណ៍ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="expense_report" onchange="toggleSubGroupCheckbox('expense_report')">
+                                    📄 ការងាររបាយការណ៍
+                                </div>
+                                <div class="permission-row" id="children_expense_report">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_report_view" value="expense_report_view">
+                                        <label for="perm_expense_report_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_report_add" value="expense_report_add">
+                                        <label for="perm_expense_report_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_report_edit" value="expense_report_edit">
+                                        <label for="perm_expense_report_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_report_delete" value="expense_report_delete">
+                                        <label for="perm_expense_report_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('expense_report', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('expense_report', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- 2. ការងារសេចក្តីសម្រេច -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="expense_decision" onchange="toggleSubGroupCheckbox('expense_decision')">
+                                    ⚖️ ការងារសេចក្តីសម្រេច
+                                </div>
+                                <div class="permission-row" id="children_expense_decision">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_decision_view" value="expense_decision_view">
+                                        <label for="perm_expense_decision_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_decision_add" value="expense_decision_add">
+                                        <label for="perm_expense_decision_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_decision_edit" value="expense_decision_edit">
+                                        <label for="perm_expense_decision_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_decision_delete" value="expense_decision_delete">
+                                        <label for="perm_expense_decision_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('expense_decision', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('expense_decision', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- 3. ការងារចេញដីការ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="expense_warrant" onchange="toggleSubGroupCheckbox('expense_warrant')">
+                                    📜 ការងារចេញដីការ
+                                </div>
+                                <div class="permission-row" id="children_expense_warrant">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_warrant_view" value="expense_warrant_view">
+                                        <label for="perm_expense_warrant_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_warrant_add" value="expense_warrant_add">
+                                        <label for="perm_expense_warrant_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_warrant_edit" value="expense_warrant_edit">
+                                        <label for="perm_expense_warrant_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_warrant_delete" value="expense_warrant_delete">
+                                        <label for="perm_expense_warrant_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('expense_warrant', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('expense_warrant', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- 4. ការងារហិរញ្ញវត្ថុ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="expense_financial" onchange="toggleSubGroupCheckbox('expense_financial')">
+                                    💰 ការងារហិរញ្ញវត្ថុ
+                                </div>
+                                <div class="permission-row" id="children_expense_financial">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_financial_view" value="expense_financial_view">
+                                        <label for="perm_expense_financial_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_financial_add" value="expense_financial_add">
+                                        <label for="perm_expense_financial_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_financial_edit" value="expense_financial_edit">
+                                        <label for="perm_expense_financial_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_financial_delete" value="expense_financial_delete">
+                                        <label for="perm_expense_financial_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('expense_financial', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('expense_financial', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <!-- 5. ការងារឯកសារចេញផ្សេងៗ -->
+                            <div class="permission-sub-group">
+                                <div class="permission-sub-title">
+                                    <input type="checkbox" class="sub-group-checkbox" data-subgroup="expense_other" onchange="toggleSubGroupCheckbox('expense_other')">
+                                    📌 ការងារឯកសារចេញផ្សេងៗ
+                                </div>
+                                <div class="permission-row" id="children_expense_other">
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_other_view" value="expense_other_view">
+                                        <label for="perm_expense_other_view">👁️ មើល</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_other_add" value="expense_other_add">
+                                        <label for="perm_expense_other_add">➕ បន្ថែម</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_other_edit" value="expense_other_edit">
+                                        <label for="perm_expense_other_edit">✏️ កែប្រែ</label>
+                                    </div>
+                                    <div class="permission-item">
+                                        <input type="checkbox" id="perm_expense_other_delete" value="expense_other_delete">
+                                        <label for="perm_expense_other_delete">🗑️ លុប</label>
+                                    </div>
+                                </div>
+                                <div class="permission-action-row">
+                                    <button type="button" class="btn-select-all" onclick="toggleGroup('expense_other', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                    <button type="button" class="btn-deselect-all" onclick="toggleGroup('expense_other', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                                </div>
+                            </div>
+
+                            <div class="permission-action-row">
+                                <button type="button" class="btn-select-all" onclick="toggleGroup('expense', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                <button type="button" class="btn-deselect-all" onclick="toggleGroup('expense', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== ថវិកា ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="budget" onchange="toggleGroupCheckbox('budget')">
+                            <i class="fas fa-coins"></i> ថវិកា
+                        </div>
+                        <div class="permission-children" id="children_budget">
+                            <div class="permission-row">
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_income_budget_view" value="income_budget_view">
+                                    <label for="perm_income_budget_view">📊 ថវិកាចូល</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_expense_budget_view" value="expense_budget_view">
+                                    <label for="perm_expense_budget_view">📊 ថវិកាចេញ</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_total_budget_view" value="total_budget_view">
+                                    <label for="perm_total_budget_view">📊 ថវិការសរុប</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== របកអតិថិជន ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="customers" onchange="toggleGroupCheckbox('customers')">
+                            <i class="fas fa-users"></i> របកអតិថិជន
+                        </div>
+                        <div class="permission-children" id="children_customers">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_customers_view" value="customers_view">
+                                <label for="perm_customers_view">👁️ មើល</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== ពត៌មាន ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="info" onchange="toggleGroupCheckbox('info')">
+                            <i class="fas fa-info-circle"></i> ពត៌មាន
+                        </div>
+                        <div class="permission-children" id="children_info">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_info_view" value="info_view">
+                                <label for="perm_info_view">👁️ មើល</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm_info_upload" value="info_upload">
+                                <label for="perm_info_upload">📤 ផ្ទុកឯកសារ</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== គ្រប់គ្រងបុគ្គលិក ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="employees" onchange="toggleGroupCheckbox('employees')">
+                            <i class="fas fa-user-tie"></i> គ្រប់គ្រងបុគ្គលិក
+                        </div>
+                        <div class="permission-children" id="children_employees">
+                            <div class="permission-row">
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_employees_view" value="employees_view">
+                                    <label for="perm_employees_view">👁️ មើល</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_employees_add" value="employees_add">
+                                    <label for="perm_employees_add">➕ បន្ថែម</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_employees_edit" value="employees_edit">
+                                    <label for="perm_employees_edit">✏️ កែប្រែ</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_employees_delete" value="employees_delete">
+                                    <label for="perm_employees_delete">🗑️ លុប</label>
+                                </div>
+                            </div>
+                            <div class="permission-action-row">
+                                <button type="button" class="btn-select-all" onclick="toggleGroup('employees', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                <button type="button" class="btn-deselect-all" onclick="toggleGroup('employees', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== ការកំណត់ ===== -->
+                    <div class="permission-group">
+                        <div class="permission-group-title">
+                            <input type="checkbox" class="group-checkbox" data-group="settings" onchange="toggleGroupCheckbox('settings')">
+                            <i class="fas fa-cog"></i> ការកំណត់
+                        </div>
+                        <div class="permission-children" id="children_settings">
+                            <div class="permission-row">
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_settings_view" value="settings_view">
+                                    <label for="perm_settings_view">👁️ មើលការកំណត់</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_settings_users" value="settings_users">
+                                    <label for="perm_settings_users">👤 គ្រប់គ្រងអ្នកប្រើប្រាស់</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_settings_roles" value="settings_roles">
+                                    <label for="perm_settings_roles">🔑 គ្រប់គ្រងតួនាទី</label>
+                                </div>
+                                <div class="permission-item">
+                                    <input type="checkbox" id="perm_settings_audit" value="settings_audit">
+                                    <label for="perm_settings_audit">📋 មើលសវនកម្ម</label>
+                                </div>
+                            </div>
+                            <div class="permission-action-row">
+                                <button type="button" class="btn-select-all" onclick="toggleGroup('settings', true)">✓ ជ្រើសរើសទាំងអស់</button>
+                                <button type="button" class="btn-deselect-all" onclick="toggleGroup('settings', false)">✕ ដោះជ្រើសរើសទាំងអស់</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fas fa-save"></i> រក្សាទុក
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" style="display:none;"></div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            body.classList.toggle('dark-theme');
+            toggle.classList.toggle('active');
+            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggle').classList.add('active');
+            }
+            loadUsers();
+            loadRoles();
+            loadAuditLogs();
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            if (!sidebar || !hamburger) return;
+            if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
+
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // ===== MODAL =====
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // ===== TREE PERMISSION FUNCTIONS =====
+        function toggleGroupCheckbox(group) {
+            const mainCheckbox = document.querySelector(`.group-checkbox[data-group="${group}"]`);
+            const allChildren = document.querySelectorAll(`#children_${group} input[type="checkbox"]`);
+            allChildren.forEach(cb => { cb.checked = mainCheckbox.checked; });
+        }
+
+        function toggleSubGroupCheckbox(subgroup) {
+            const subCheckbox = document.querySelector(`.sub-group-checkbox[data-subgroup="${subgroup}"]`);
+            const allChildren = document.querySelectorAll(`#children_${subgroup} input[type="checkbox"]`);
+            allChildren.forEach(cb => { cb.checked = subCheckbox.checked; });
+        }
+
+        function toggleGroup(group, select) {
+            const allChildren = document.querySelectorAll(`#children_${group} input[type="checkbox"]`);
+            allChildren.forEach(cb => { cb.checked = select; });
+
+            const mainCheckbox = document.querySelector(`.group-checkbox[data-group="${group}"]`);
+            if (mainCheckbox) mainCheckbox.checked = select;
+
+            const subCheckboxes = document.querySelectorAll(`.sub-group-checkbox[data-subgroup^="${group}"]`);
+            subCheckboxes.forEach(cb => {
+                const subgroup = cb.dataset.subgroup;
+                const children = document.querySelectorAll(`#children_${subgroup} input[type="checkbox"]`);
+                const allChecked = children.length > 0 && Array.from(children).every(c => c.checked);
+                cb.checked = allChecked;
+            });
+        }
+
+        // ===== LOAD PERMISSIONS =====
+        function loadPermissionsIntoForm(permissions) {
+            document.querySelectorAll('.permission-group input[type="checkbox"], .permission-sub-group input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            if (!permissions) return;
+
+            let permList = [];
+            if (typeof permissions === 'string') {
+                permList = permissions.split(',').map(p => p.trim());
+            } else if (Array.isArray(permissions)) {
+                permList = permissions.map(p => p.trim());
+            }
+
+            permList.forEach(p => {
+                if (p) {
+                    const cb = document.getElementById(`perm_${p}`);
+                    if (cb) cb.checked = true;
+                }
+            });
+
+            document.querySelectorAll('.group-checkbox').forEach(cb => {
+                const group = cb.dataset.group;
+                const children = document.querySelectorAll(`#children_${group} input[type="checkbox"]`);
+                const allChecked = children.length > 0 && Array.from(children).every(c => c.checked);
+                cb.checked = allChecked;
+            });
+
+            document.querySelectorAll('.sub-group-checkbox').forEach(cb => {
+                const subgroup = cb.dataset.subgroup;
+                const children = document.querySelectorAll(`#children_${subgroup} input[type="checkbox"]`);
+                const allChecked = children.length > 0 && Array.from(children).every(c => c.checked);
+                cb.checked = allChecked;
+            });
+        }
+
+        // ===== GET SELECTED PERMISSIONS =====
+        function getSelectedPermissions() {
+            const selected = [];
+            document.querySelectorAll('.permission-item input[type="checkbox"]:checked').forEach(cb => {
+                if (cb.value && cb.value.trim() !== '') selected.push(cb.value);
+            });
+            return selected.join(',');
+        }
+
+        // ============================================
+        // USERS
+        // ============================================
+        async function loadUsers() {
+    try {
+        const res = await fetch('/api/users');
+        const data = await res.json();
+        const tbody = document.getElementById('usersTableBody');
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-message">មិនទាន់មានអ្នកប្រើប្រាស់ទេ</td></tr>';
+            return;
+        }
+        let html = '';
+        data.forEach((u, i) => {
+            html += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td>${u.username}</td>
+                    <td>${u.full_name || '-'}</td>
+                    <td>${u.phone || '-'}</td>  <!-- ← ប្តូរពី email -->
+                    <td>${u.role_name}</td>
+                    <td><span class="status-badge ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'សកម្ម' : 'អសកម្ម'}</span></td>
+                    <td>
+                        <button class="btn-primary btn-sm" onclick="editUser(${u.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-warning btn-sm" onclick="resetPassword(${u.id})"><i class="fas fa-key"></i></button>
+                        <button class="btn-danger btn-sm" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    } catch (e) { console.error(e); }
+}
+
+        function openUserModal() {
+    document.getElementById('userId').value = '';
+    document.getElementById('userForm').reset();
+    document.getElementById('userPassword').required = true;
+    document.getElementById('userPassword').placeholder = 'បញ្ចូលពាក្យសម្ងាត់';
+    document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> បន្ថែមអ្នកប្រើប្រាស់';
+    document.getElementById('userPhone').value = '';  // ← សម្អាត
+    loadRolesSelect();
+    openModal('userModal');
+}
+
+        async function editUser(id) {
+    try {
+        const res = await fetch('/api/users');
+        const users = await res.json();
+        const user = users.find(u => u.id === id);
+        if (!user) return;
+
+        document.getElementById('userId').value = user.id;
+        document.getElementById('userUsername').value = user.username;
+        document.getElementById('userFullName').value = user.full_name || '';
+        document.getElementById('userPhone').value = user.phone || '';  // ← ប្តូរពី email
+        document.getElementById('userStatus').value = user.is_active;
+        document.getElementById('userPassword').required = false;
+        document.getElementById('userPassword').placeholder = 'ទុកចោលប្រសិនបើមិនចង់ប្តូរ';
+        document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-edit"></i> កែប្រែអ្នកប្រើប្រាស់';
+        await loadRolesSelect(user.role_id);
+        openModal('userModal');
+    } catch (e) { console.error(e); }
+}
+
+        async function loadRolesSelect(selected = null) {
+            try {
+                const res = await fetch('/api/roles');
+                const roles = await res.json();
+                const select = document.getElementById('userRole');
+                select.innerHTML = '';
+                roles.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.id;
+                    opt.textContent = r.name;
+                    if (selected && selected == r.id) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveUser(e) {
+    e.preventDefault();
+    const id = document.getElementById('userId').value;
+
+    // ===== ពិនិត្យលេខទូរស័ព្ទ =====
+    const phone = document.getElementById('userPhone').value.trim();
+    if (!phone) {
+        showToast('សូមបញ្ចូលលេខទូរស័ព្ទរបស់អ្នកប្រើប្រាស់!', 'error');
+        return;
+    }
+
+    // ===== ពិនិត្យទម្រង់លេខទូរស័ព្ទ (តែលេខ) =====
+    const phonePattern = /^[0-9]{9,10}$/;
+    if (!phonePattern.test(phone)) {
+        showToast('លេខទូរស័ព្ទមិនត្រឹមត្រូវ! (ត្រូវមាន 9-10 ខ្ទង់)', 'error');
+        return;
+    }
+
+    const data = {
+        username: document.getElementById('userUsername').value,
+        full_name: document.getElementById('userFullName').value,
+        phone: phone,  // ← ប្តូរពី email ទៅ phone
+        role_id: parseInt(document.getElementById('userRole').value),
+        is_active: parseInt(document.getElementById('userStatus').value)
+    };
+
+    const password = document.getElementById('userPassword').value;
+    if (password) data.password = password;
+
+    try {
+        const url = id ? `/api/users/${id}` : '/api/users';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.success) {
+            closeModal('userModal');
+            loadUsers();
+            showToast(id ? 'កែប្រែអ្នកប្រើប្រាស់ដោយជោគជ័យ!' : 'បន្ថែមអ្នកប្រើប្រាស់ដោយជោគជ័យ!');
+        } else {
+            showToast(result.error || 'មានបញ្ហា!', 'error');
+        }
+    } catch (e) {
+        showToast('មានបញ្ហាក្នុងការរក្សាទុក!', 'error');
+    }
+}
+
+        async function resetPassword(id) {
+            if (!confirm('តើអ្នកចង់កំណត់ពាក្យសម្ងាត់ឡើងវិញមែនទេ?')) return;
+            try {
+                const res = await fetch(`/api/users/${id}/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ new_password: 'password123' }) });
+                const result = await res.json();
+                if (result.success) {
+                    showToast('កំណត់ពាក្យសម្ងាត់ឡើងវិញដោយជោគជ័យ! (ពាក្យសម្ងាត់ថ្មី: password123)');
+                }
+            } catch (e) { showToast('មានបញ្ហា!', 'error'); }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('តើអ្នកពិតជាចង់លុបអ្នកប្រើប្រាស់នេះមែនទេ?')) return;
+            try {
+                const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                const result = await res.json();
+                if (result.success) { loadUsers(); showToast('លុបអ្នកប្រើប្រាស់ដោយជោគជ័យ!'); }
+            } catch (e) { showToast('មានបញ្ហា!', 'error'); }
+        }
+
+        // ============================================
+        // ROLES
+        // ============================================
+        async function loadRoles() {
+            try {
+                const res = await fetch('/api/roles');
+                const data = await res.json();
+                const tbody = document.getElementById('rolesTableBody');
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-message">មិនទាន់មានតួនាទីទេ</td></tr>';
+                    return;
+                }
+                let html = '';
+                data.forEach((r, i) => {
+                    let permsDisplay = 'គ្មាន';
+                    if (r.permissions) {
+                        const permList = r.permissions.split(',').map(p => p.trim());
+                        if (permList.includes('all')) {
+                            permsDisplay = 'ទាំងអស់';
+                        } else {
+                            const permNames = {
+                                'dashboard': 'Dashboard',
+                                'income_bank_view': 'មើលធនាគារ',
+                                'income_bank_add': 'បន្ថែមធនាគារ',
+                                'income_bank_edit': 'កែធនាគារ',
+                                'income_bank_delete': 'លុបធនាគារ',
+                                'income_land_view': 'មើលដី',
+                                'income_land_add': 'បន្ថែមដី',
+                                'income_land_edit': 'កែដី',
+                                'income_land_delete': 'លុបដី',
+                                'income_home_view': 'មើលផ្ទះ',
+                                'income_home_add': 'បន្ថែមផ្ទះ',
+                                'income_home_edit': 'កែផ្ទះ',
+                                'income_home_delete': 'លុបផ្ទះ',
+                                'income_wedding_view': 'មើលអាពាហ៍ពិពាហ៍',
+                                'income_wedding_add': 'បន្ថែមអាពាហ៍ពិពាហ៍',
+                                'income_wedding_edit': 'កែអាពាហ៍ពិពាហ៍',
+                                'income_wedding_delete': 'លុបអាពាហ៍ពិពាហ៍',
+                                'income_other_view': 'មើលផ្សេងៗ',
+                                'income_other_add': 'បន្ថែមផ្សេងៗ',
+                                'income_other_edit': 'កែផ្សេងៗ',
+                                'income_other_delete': 'លុបផ្សេងៗ',
+                                'expense_report_view': 'មើលរបាយការណ៍',
+                                'expense_report_add': 'បន្ថែមរបាយការណ៍',
+                                'expense_report_edit': 'កែរបាយការណ៍',
+                                'expense_report_delete': 'លុបរបាយការណ៍',
+                                'expense_decision_view': 'មើលសេចក្តីសម្រេច',
+                                'expense_decision_add': 'បន្ថែមសេចក្តីសម្រេច',
+                                'expense_decision_edit': 'កែសេចក្តីសម្រេច',
+                                'expense_decision_delete': 'លុបសេចក្តីសម្រេច',
+                                'expense_warrant_view': 'មើលដីការ',
+                                'expense_warrant_add': 'បន្ថែមដីការ',
+                                'expense_warrant_edit': 'កែដីការ',
+                                'expense_warrant_delete': 'លុបដីការ',
+                                'expense_financial_view': 'មើលហិរញ្ញវត្ថុ',
+                                'expense_financial_add': 'បន្ថែមហិរញ្ញវត្ថុ',
+                                'expense_financial_edit': 'កែហិរញ្ញវត្ថុ',
+                                'expense_financial_delete': 'លុបហិរញ្ញវត្ថុ',
+                                'expense_other_view': 'មើលចេញផ្សេងៗ',
+                                'expense_other_add': 'បន្ថែមចេញផ្សេងៗ',
+                                'expense_other_edit': 'កែចេញផ្សេងៗ',
+                                'expense_other_delete': 'លុបចេញផ្សេងៗ',
+                                'income_budget_view': 'ថវិកាចូល',
+                                'expense_budget_view': 'ថវិកាចេញ',
+                                'total_budget_view': 'ថវិការសរុប',
+                                'customers_view': 'អតិថិជន',
+                                'info_view': 'ពត៌មាន',
+                                'info_upload': 'ផ្ទុកឯកសារ',
+                                'employees_view': 'បុគ្គលិក',
+                                'employees_add': 'បន្ថែមបុគ្គលិក',
+                                'employees_edit': 'កែបុគ្គលិក',
+                                'employees_delete': 'លុបបុគ្គលិក',
+                                'settings_view': 'ការកំណត់',
+                                'settings_users': 'គ្រប់គ្រងអ្នកប្រើ',
+                                'settings_roles': 'គ្រប់គ្រងតួនាទី',
+                                'settings_audit': 'សវនកម្ម'
+                            };
+                            const displayPerms = permList.map(p => permNames[p] || p);
+                            permsDisplay = displayPerms.join(', ');
+                        }
+                    }
+                    html += `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${r.name}</td>
+                            <td>${r.description || '-'}</td>
+                            <td style="font-size:12px;">${permsDisplay}</td>
+                            <td>
+                                <button class="btn-primary btn-sm" onclick="editRole(${r.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn-danger btn-sm" onclick="deleteRole(${r.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            } catch (e) { console.error(e); }
+        }
+
+        function openRoleModal() {
+            document.getElementById('roleId').value = '';
+            document.getElementById('roleForm').reset();
+            document.querySelectorAll('.permission-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.permission-sub-group input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('roleModalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> បង្កើតតួនាទី';
+            openModal('roleModal');
+        }
+
+        async function editRole(id) {
+            try {
+                const res = await fetch('/api/roles');
+                const roles = await res.json();
+                const role = roles.find(r => r.id === id);
+                if (!role) {
+                    showToast('មិនឃើញតួនាទីនេះទេ!', 'error');
+                    return;
+                }
+                document.getElementById('roleId').value = role.id;
+                document.getElementById('roleName').value = role.name;
+                document.getElementById('roleDescription').value = role.description || '';
+                loadPermissionsIntoForm(role.permissions);
+                document.getElementById('roleModalTitle').innerHTML = '<i class="fas fa-edit"></i> កែប្រែតួនាទី';
+                openModal('roleModal');
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveRole(e) {
+            e.preventDefault();
+            const id = document.getElementById('roleId').value;
+            const permissions = getSelectedPermissions();
+            if (!permissions) {
+                showToast('សូមជ្រើសរើសសិទ្ធិយ៉ាងហោចណាស់មួយ!', 'error');
+                return;
+            }
+            const data = {
+                name: document.getElementById('roleName').value.trim(),
+                description: document.getElementById('roleDescription').value.trim(),
+                permissions: permissions
+            };
+            if (!data.name) {
+                showToast('សូមបញ្ចូលឈ្មោះតួនាទី!', 'error');
+                return;
+            }
+            try {
+                const url = id ? `/api/roles/${id}` : '/api/roles';
+                const method = id ? 'PUT' : 'POST';
+                const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await res.json();
+                if (result.success) {
+                    closeModal('roleModal');
+                    loadRoles();
+                    loadRolesSelect();
+                    showToast(id ? 'កែប្រែតួនាទីដោយជោគជ័យ!' : 'បង្កើតតួនាទីដោយជោគជ័យ!');
+                }
+            } catch (e) { showToast('មានបញ្ហា!', 'error'); }
+        }
+
+        async function deleteRole(id) {
+            if (!confirm('តើអ្នកពិតជាចង់លុបតួនាទីនេះមែនទេ?')) return;
+            try {
+                const res = await fetch(`/api/roles/${id}`, { method: 'DELETE' });
+                const result = await res.json();
+                if (result.success) { loadRoles(); loadRolesSelect(); showToast('លុបតួនាទីដោយជោគជ័យ!'); }
+            } catch (e) { showToast('មានបញ្ហា!', 'error'); }
+        }
+
+        // ============================================
+        // AUDIT
+        // ============================================
+        async function loadAuditLogs(search = '') {
+            try {
+                const url = search ? `/api/audit-logs?search=${encodeURIComponent(search)}` : '/api/audit-logs';
+                const res = await fetch(url);
+                const data = await res.json();
+                const tbody = document.getElementById('auditTableBody');
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-message">មិនទាន់មានកំណត់ត្រាសវនកម្មទេ</td></tr>';
+                    return;
+                }
+                let html = '';
+                data.forEach((log, i) => {
+                    html += `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>${log.username}</td>
+                            <td>${log.action}</td>
+                            <td>${log.module}</td>
+                            <td style="font-size:12px;">${log.details || '-'}</td>
+                            <td style="font-size:12px;">${log.created_at}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            } catch (e) { console.error(e); }
+        }
+
+        function searchAudit() {
+            const search = document.getElementById('auditSearch').value;
+            loadAuditLogs(search);
+        }
+
+        function refreshAudit() {
+            document.getElementById('auditSearch').value = '';
+            loadAuditLogs();
+            showToast('ធ្វើឱ្យទិន្នន័យថ្មី!', 'info');
+        }
+    </script>
+<script>
+// ===== ចុះឈ្មោះ Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+            console.log('✅ Service Worker registered successfully!');
+
+            // ===== ពិនិត្យ Update =====
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('🔄 New Service Worker available!');
+                        // Reload page to use new version
+                        // window.location.reload();
+                    }
+                });
+            });
+        })
+        .catch(err => {
+            console.log('❌ Service Worker registration failed:', err);
+        });
+}
+
+// ===== ទទួលសារពី Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.type === 'ONLINE') {
+            console.log('📡', event.data.message);
+            // Show notification to user
+            // alert(event.data.message);
+        }
+    });
+}
+</script>
+</body>
+</html>

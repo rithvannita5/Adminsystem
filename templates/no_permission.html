@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>គ្មានសិទ្ធិ - ប្រព័ន្ធគ្រប់គ្រងរដ្ឋបាល</title>
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Khmer&display=swap');
+        body {
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #0a2a6e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .no-permission-container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .no-permission-container .icon {
+            font-size: 80px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        .no-permission-container h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .no-permission-container p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .btn-back {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #1a237e;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Khmer', 'Khmer OS', sans-serif;
+        }
+        .btn-back:hover {
+            background: #0d1442;
+            transform: scale(1.05);
+        }
+        .btn-back i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-permission-container">
+        <div class="icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1>⛔ អ្នកមិនមានសិទ្ធិ</h1>
+        <p>សូមអភ័យទោស! អ្នកមិនមានសិទ្ធិចូលប្រើទំព័រនេះទេ។<br>
+        សូមទាក់ទងអ្នកគ្រប់គ្រងប្រព័ន្ធដើម្បីសុំសិទ្ធិបន្ថែម។</p>
+        <a href="/dashboard" class="btn-back">
+            <i class="fas fa-arrow-left"></i> ត្រឡប់ទៅ Dashboard
+        </a>
+    </div>
+    <script>
+// ===== ចុះឈ្មោះ Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+            console.log('✅ Service Worker registered successfully!');
+
+            // ===== ពិនិត្យ Update =====
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('🔄 New Service Worker available!');
+                        // Reload page to use new version
+                        // window.location.reload();
+                    }
+                });
+            });
+        })
+        .catch(err => {
+            console.log('❌ Service Worker registration failed:', err);
+        });
+}
+
+// ===== ទទួលសារពី Service Worker =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.type === 'ONLINE') {
+            console.log('📡', event.data.message);
+            // Show notification to user
+            // alert(event.data.message);
+        }
+    });
+}
+</script>
+</body>
+</html>
