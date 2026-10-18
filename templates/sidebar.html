@@ -638,7 +638,7 @@
         {% if 'all' in permissions or 'customers_view' in permissions %}
         <a href="/customers" class="{% if request.endpoint == 'customers' %}active{% endif %}">
             <i class="fas fa-users menu-icon customers"></i>
-            <span class="menu-text">របកអតិថិជន</span>
+            <span class="menu-text">របាយកាណ៍អតិថិជន</span>
             {% if total_customers and total_customers > 0 %}
             <span class="badge">{{ total_customers }}</span>
             {% endif %}
